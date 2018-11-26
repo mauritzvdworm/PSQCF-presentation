@@ -1,0 +1,45 @@
+ProductGroup,Subgroup,Period,Non Electronic,ATS,Manual
+Agriculture,Commodity Index,2012,26,22.6,51.5
+Agriculture,Commodity Index,2016,35.7,22.4,41.9
+Agriculture,Dairy,2012,4.1,6.8,89.1
+Agriculture,Dairy,2016,1.7,14.6,83.7
+Agriculture,Grain and Oilseed,2012,5.6,39,55.4
+Agriculture,Grain and Oilseed,2016,4.1,49,46.9
+Agriculture,Livestock,2012,11.3,32.4,56.3
+Agriculture,Livestock,2016,2.5,45.8,51.8
+Agriculture,Lumber and Pulp,2012,6.9,10.5,82.6
+Agriculture,Lumber and Pulp,2016,1.4,20.4,78.2
+Energy,Biofuels,2012,79.4,2.5,18.1
+Energy,Biofuels,2016,85.3,2.4,12.2
+Energy,Coal,2012,100,0,
+Energy,Coal,2016,100,0,
+Energy,Crude Oil,2012,5.5,54.3,40.2
+Energy,Crude Oil,2016,3.5,63,33.6
+Energy,Electricity,2012,100,0,
+Energy,Electricity,2016,100,0,
+Energy,Natural Gas,2012,21.2,44.2,34.6
+Energy,Natural Gas,2016,13.3,56.8,29.9
+Energy,Refined Products,2012,15,46,39
+Energy,Refined Products,2016,12.2,54.6,33.2
+Equities,International Index,2012,0.4,69.3,30.3
+Equities,International Index,2016,0.2,76.2,23.6
+Equities,Select Sector Index,2012,18.8,59.2,22
+Equities,Select Sector Index,2016,42.2,45.3,12.4
+Equities,US Index,2012,0.9,66.5,32.6
+Equities,US Index,2016,0.8,71.5,27.7
+FX,E Micros,2012,0,66.3,33.7
+FX,E Micros,2016,0,69.3,30.7
+FX,Emerging Markets,2012,12.5,70.3,17.1
+FX,Emerging Markets,2016,5.6,76.2,18.2
+FX,G10,2012,2.8,80.7,16.4
+FX,G10,2016,0.7,83.7,15.6
+Interest Rate,Deliverable Swaps,2012,16.3,47.8,35.9
+Interest Rate,Deliverable Swaps,2016,10,47.5,42.5
+Interest Rate,Stirs,2012,16.3,47.8,35.9
+Interest Rate,Stirs,2016,10,47.5,42.5
+Interest Rate,US Treasury,2012,5.9,64,30.2
+Interest Rate,US Treasury,2016,4.5,68.4,27.1
+Metals,Base,2012,3.1,49.2,47.7
+Metals,Base,2016,2.2,56.9,40.9
+Metals,Precious,2012,6.1,45.9,48
+Metals,Precious,2016,5,53.5,41.5

@@ -1,0 +1,1742 @@
+---
+title: "Polar Star Quantitative Commodity Fund"
+author: "Dr Mauritz van den Worm, PhD"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  revealjs::revealjs_presentation:
+    reveal_options:
+      minScale: 1.0
+      maxScale: 1.0
+      slideNumber: true
+    includes:
+      in_header: addlogo.html
+    theme: simple
+    highlight: pygments
+    center: true
+    mathjax: "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+    self_contained: false
+    reveal_plugins: ["menu"]
+    css: custom.css
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+library(data.table)
+library(ggplot2)
+library(plotly)
+library(rhandsontable)
+library(knitr)
+library(readr)
+library(purrr)
+library(wavethresh)
+library(extrafont)
+library(scales)
+library(PortfolioAnalytics)
+library(formattable)
+
+loadfonts(device = "win")
+
+
+```
+
+
+
+
+
+# Manual vs Automated Trading  {data-background="img/background_mtns_1.png"}
+
+
+##  {data-background="img/BlueBackgroundWithOrange.png"}
+
+*How has the increase of Automated Trading Systems (ATS) influenced the futures market?*
+
+- CME transaction data identitifies ATS with the 1028 tag
+- Data available from November 2012 to present
+- Consider data form 2012 to 2016
+- Use gradient plots to highlight the changes
+- Graphs are interactive
+
+
+
+
+
+
+## MAN vs ATS - Group  {data-background="img/BlueBackgroundWithOrange.png"}
+
+
+```{r}
+
+manvsautbygroup <- fread("./data/manualvsautomatedbyproductgroup.csv")
+manvsautbygroup <- manvsautbygroup[, c(1,3:6), with = FALSE]
+plotdata <- melt(manvsautbygroup, id.vars = c("ProductGroupName", "Period"))
+
+pic <- ggplot(plotdata, aes(x=factor(Period), y=value)) +
+  geom_line(aes(group=ProductGroupName, color=ProductGroupName)) +
+  geom_point(aes(color=ProductGroupName)) +
+  facet_wrap(~variable) +
+  ylab("Percentage of trades") +
+  xlab("") +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    text=element_text(family="Century Gothic")
+  )
+
+
+ggplotly(pic)
+
+
+```
+
+
+
+
+## MAN vs ATS - Agriculture  {data-background="img/BlueBackgroundWithOrange.png"}
+
+
+```{r}
+
+agriculture <- fread("./data/manualvsautomatedbyproductsubgroup.csv")
+agriculture <- agriculture[ProductGroup == "Agriculture"]
+plotdata <- melt(agriculture, id.vars = c("ProductGroup", "Subgroup", "Period"))
+
+pic <- ggplot(plotdata, aes(x=factor(Period), y=value)) +
+  geom_line(aes(group=Subgroup, color=Subgroup)) +
+  geom_point(aes(color=Subgroup)) +
+  facet_wrap(~variable) +
+  ylab("Percentage of trades") +
+  xlab("") +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    text=element_text(family="Century Gothic")
+  )
+
+ggplotly(pic)
+
+```
+
+
+
+
+## MAN vs ATS - Energy  {data-background="img/BlueBackgroundWithOrange.png"}
+
+
+```{r}
+
+energy <- fread("./data/manualvsautomatedbyproductsubgroup.csv")
+energy <- energy[ProductGroup == "Energy"]
+plotdata <- melt(energy, id.vars = c("ProductGroup", "Subgroup", "Period"))
+
+pic <- ggplot(plotdata, aes(x=factor(Period), y=value)) +
+  geom_line(aes(group=Subgroup, color=Subgroup)) +
+  geom_point(aes(color=Subgroup)) +
+  facet_wrap(~variable) +
+  ylab("Percentage of trades") +
+  xlab("") +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    text=element_text(family="Century Gothic")
+  )
+
+ggplotly(pic)
+
+```
+
+
+
+
+
+## Trade Participation  {data-background="img/BlueBackgroundWithOrange.png"}
+
+
+```{r}
+
+mostactive <- fread("./data/manualvsautomatedmostactive.csv")
+mostactive <- mostactive[ProductGroup %in% c("Agriculture", "Energy", "Metals")]
+plotdata <- melt(mostactive, id.vars = c("ProductGroup", "Subgroup", "Futures Product", "Period"))
+
+pic <- ggplot(plotdata, aes(x=factor(Period), y=value)) +
+  geom_line(aes(group=`Futures Product`, color=`Futures Product`)) +
+  geom_point(aes(color=`Futures Product`)) +
+  facet_wrap(~variable) +
+  ylab("Percentage of trades") +
+  xlab("") +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    text=element_text(family="Century Gothic")
+  )
+
+ggplotly(pic)
+
+```
+
+
+
+
+
+## Literature  {data-background="img/BlueBackgroundWithOrange.png"}
+
+- <a href = "https://www.cmegroup.com/education/files/Algo_and_HFT_Trading_0610.pdf" target="_blank">Algorithmic trading and Market Dynamics</a>
+
+- <a href = "http://www.cftc.gov/idc/groups/public/@economicanalysis/documents/file/oce_automatedtrading.pdf" target="_blank">Automated Trading in Futures Markets, Richard Haynes and John S. Roberts</a>
+
+- <a href = "http://www.cftc.gov/idc/groups/public/@economicanalysis/documents/file/oce_automatedtrading_update.pdf" target="_blank">Automated Trading in Futures Markets - Update, Richard Haynes and John S. Roberts</a>
+
+
+
+
+
+
+
+# Grinold's Fundamental Law of Active Portfolio Management {data-background="img/background_mtns_1.png"}
+
+## Law of active portfolio management {data-background="img/BlueBackgroundWithOrange.png"}
+
+
+$$
+\text{Performance} = \text{Skill} \times \sqrt{\text{Breadth}}
+$$
+
+
+
+## Suppose we are in a coin flipping casino {data-background="img/BlueBackgroundWithOrange.png"}
+
+- Flip coins in stead of futures
+- The coin is biased - $P(\text{heads}) = 0.51$
+
+
+
+## How does the betting work? {data-background="img/BlueBackgroundWithOrange.png"}
+
+- We have 1000 coins 
+- The minimum wager is 1 coin
+- If you win you gain 1 coin
+- If you loose you loose 1 coin
+- There are 1000 tables with coin wagers
+- Games runs in parallel
+
+
+## What is the optimal way to allocate coins? {data-background="img/BlueBackgroundWithOrange.png"}
+
+Two extremes
+
+- Bet 1000 coins on one coin flip
+- Bet 1 coin on 1000 coin flips
+
+
+## Expected Return {data-background="img/BlueBackgroundWithOrange.png"}
+
+- Single bet:   $0.51 \times 1000 + 0.49 \times (-1000) = 20$
+
+- Multi bet:   $1000 \times [0.51  + 0.49 \times (-1)]  = 20$
+
+The same expected return
+
+
+## Risk - Probability to lose it all: {data-background="img/BlueBackgroundWithOrange.png"}
+
+- Single bet: 49%
+
+- Multi bet: $0.49 \times 0.49 \times \dots \times 0.49 = 0.49^{1000} \approx 0$
+
+
+
+## Risk - Standard Deviation: {data-background="img/BlueBackgroundWithOrange.png"}
+
+- One coin per table
+
+$$
+\text{risk} := \text{std}\left\{1,-1,-1,1, \dots, 1 \right\} = 1
+$$
+
+
+
+- One 1000 coin bet, 999 zero coin bets
+
+
+$$
+\begin{align}
+  \text{risk} &:= \text{std}\left\{1000,0,0,0, \dots, 0 \right\} = 31.62 \\
+  \text{risk} &:= \text{std}\left\{-1000,0,0,0, \dots, 0 \right\} = 31.62
+\end{align}
+$$
+
+
+
+
+## Coin Flip Casino - Reward/Risk {data-background="img/BlueBackgroundWithOrange.png"}
+
+- Just like Sharpe Ratio
+
+- Single bet:   $\text{SR}_{\text{single}} = \frac{20}{31.62} =0.63$
+
+- Multi bet:   $\text{SR}_{\text{multiple}} = \frac{20}{1} =20$
+
+
+
+## Coin flipping casino - Observation {data-background="img/BlueBackgroundWithOrange.png"}
+
+- $20 = 0.63 \times \sqrt{1000}$
+ 
+- $\text{SR}_{\text{multiple}} = \text{SR}_{\text{single}} \times \sqrt{\text{Bets}}$
+
+- $\text{Performance} = \text{Skill} \times \sqrt{\text{Breadth}}$
+
+
+
+## How does this apply to commodity futures? {data-background="img/BlueBackgroundWithOrange.png"}
+
+- We use insights gained from years of fundamental trading to inspire bespoke quantitative strategies that are applied to a large collection of commodity markets
+
+- We increase breadth or diversification by
+    - how,
+    - what and
+    - when we trade
+
+
+
+
+## Literature {data-background="img/BlueBackgroundWithOrange.png"}
+
+- <a href = "http://jpm.iijournals.com/content/15/3/30" target="_blank">The fundamental law of active management - Richard C. Grinold</a>
+- <a href = "https://www.jpmorgan.com/cm/BlobServer/Extending_the_Fundamental_Law_of_Investment_Management_.pdf?blobkey=id&blobwhere=1158630145176&blobheader=application%2Fpdf&blobheadername1=Cache-Control&blobheadervalue1=private&blobcol=urldata&blobtable=MungoBlobs" target="_blank">Extending the Fundamental Law
+of Investment Management - JP Morgan US Equity Quantitative Research</a>
+
+
+
+# Technical considerations when trading futures systematically  {data-background="img/background_mtns_1.png"}
+
+## {data-background="img/BlueBackgroundWithOrange.png"}
+
+- Continuous Futures Price Series
+    - We require long time series data
+    - Futures expire too soon to gather sufficient data
+    - How do you handle rolls?
+    
+- Non-stationarity of Price Data
+    - Time series data can only reliably be forecasted if stationary
+    - Machine Learning algorithms are designed for stationary features
+    - How do we create stationary data?
+
+
+## Continuous Futures Price Series {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+contPrices <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/CalendarPortfolio/contCalendarFracDiff.csv"))
+
+```
+
+
+```{r}
+
+pic <- ggplot(contPrices[comdty == "C" & tenure == "F3"], 
+              aes(x=index, y=frontprice, text = paste('Price: ', frontprice,
+                                         '<br>Date: ', as.Date(index)))) +
+  geom_line(aes(group = frontID), colour = rgb(5,61,96, maxColorValue = 255)) +
+  theme_bw() +
+  xlab("") +
+  ylab("Price") +
+  ggtitle("Corn Continuous Price Curve with rolls indicated by discontinuities") +
+  scale_x_date(breaks = pretty_breaks(n=12)) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 14, face = "bold"),
+    axis.text = element_text(size=14),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+
+ggplotly(pic)%>%
+  layout(legend = list(orientation = "h", x = 0.4, y = -0.2))
+
+```
+
+
+## Continuous Futures Curves {data-background="img/BlueBackgroundWithOrange.png"} 
+
+
+```{r}
+
+plotdata <- contPrices[comdty == "C" & tenure == "F3", .(index, frontID,  `Raw Price` = frontprice, `Roll Adjusted Price` = `adj frontprice`)]
+plotdata <- melt(plotdata, id.vars = c("index", "frontID"))
+
+pic <- ggplot(plotdata, aes(x=index, y=value, text = paste('Price: ', value,
+                                         '<br>Date: ', as.Date(index)))) +
+  geom_line(aes(group = variable, color = variable)) +
+  theme_bw() +
+  xlab("") +
+  ylab("Price") +
+  ggtitle("Corn Continuous Roll Adjusted Price Curve") +
+  scale_x_date(breaks = pretty_breaks(n=10)) +
+  scale_color_manual(values = c(rgb(5,61,96, maxColorValue = 255), rgb(255, 90, 52, maxColorValue = 255))) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 14, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+
+ggplotly(pic)%>%
+  layout(legend = list(orientation = "h", x = 0.4, y = -0.2))
+
+```
+
+
+## Stationarity {data-background="img/BlueBackgroundWithOrange.png"} 
+
+
+```{r}
+
+fracdiffData <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/CalendarPortfolio/calendarFractionalDifferences.csv"))
+
+setnames(fracdiffData, "X1", "d")
+
+```
+
+
+```{r}
+
+plotdata <- fracdiffData[comdty == "C" & type == "front"]
+plotdata[, adjcorr := corr * 60 - 59]
+
+ggplot(plotdata, aes(x = d)) +
+  geom_line(aes(y = adfStat), color = rgb(5,61,96, maxColorValue = 255), size = 1.2) +
+  theme_bw() +
+  xlab("Degree of Difference") +
+  ylab("adf Statistic") +
+  geom_hline(yintercept = -2.8623, color = rgb(255, 90, 52, maxColorValue = 255), size = 1.2) +
+  geom_line(aes(y = adjcorr), linetype = "dashed", color = rgb(5,61,96, maxColorValue = 255), size = 1.2) +
+  scale_y_continuous(sec.axis = sec_axis(~. /-60, name = "Correlation")) +
+  ggtitle("Corn adf Statistic and Correlations with varying Degree of Difference") +
+  #scale_color_manual(values = c(rgb(5,61,96, maxColorValue = 255), rgb(255, 90, 52, maxColorValue = 255))) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 14, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+```
+
+
+
+## Stationarity {data-background="img/BlueBackgroundWithOrange.png"} 
+
+```{r}
+
+
+plotdata <- contPrices[comdty == "C" & tenure == "F3", .(index, frontID,  `ETF Price` = frontRP, `Fractional Difference` = frontFD)]
+
+plotdata[, `Differenced Price` := diff(`ETF Price`)/`ETF Price`]
+plotdata[, `Differenced Price` := guyrot(`Differenced Price`, 1)]
+plotdata[1, `Differenced Price` := NA]
+
+plotdata <- melt(plotdata, id.vars = c("index", "frontID"))
+
+
+pic <- ggplot(plotdata, aes(x=index, y=value, text = paste('Price: ', value,
+                                         '<br>Date: ', as.Date(index)))) +
+  geom_line(aes(group = variable, color = variable)) +
+  theme_bw() +
+  xlab("") +
+  ylab("Price") +
+  ggtitle("Corn ETF and Fractionally Differenced Price Curves") +
+  scale_x_date(breaks = pretty_breaks(n=10)) +
+  scale_color_manual(values = c(rgb(5,61,96, maxColorValue = 255), rgb(255, 90, 52, maxColorValue = 255), "firebrick")) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 14, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+
+ggplotly(pic)%>%
+  layout(legend = list(orientation = "h", x = 0.2, y = -0.2))
+
+
+
+```
+
+
+
+
+# Infrastructure {data-background="img/background_mtns_1.png"}
+
+##  {data-background="img/flowSlide.PNG"}
+
+
+
+
+
+# Core Strategies - Carry {data-background="img/background_mtns_1.png"}
+
+## Carry overview {data-background="img/BlueBackgroundWithOrange.png"}
+
+- Take advantage of curve shape
+- Contango is typically less steep in further dated contracts, i.e. it has a lower roll yield than near dated contracts
+- Extract roll yield with a short position in the near and a long position in the far dated contracts of the same commodity
+
+
+## Flavours of carry {data-background="img/BlueBackgroundWithOrange.png"}
+
+- **Closer to discretionary methodology - BB1**
+    - 25 commodities and 2 tenors
+    - Sizing determined using percentile methodology
+    - Risk 0.5% of strategy NAV per trade
+    - Monthly rebalance
+
+
+- **More modern - BB2**
+    - 25 commodities and 2 tenors
+    - Fractionally differenced time-series
+    - Meta labelling
+    - Ensemble machine learning
+    - Deterine probability of profitable trade and size trade accordingly
+
+
+## BB1 - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+BB1returns <- as.data.table(read_csv('C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/BB1portfoioreturns.csv'))
+BB1returns[!is.na(return), cumret := cumsum(return)]
+
+BB1live <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/BB1returns.csv"))
+BB1live[, X1 := NULL]
+setnames(BB1live, "index", "date")
+
+
+```
+
+```{r}
+
+plotdata <- rbind(BB1returns[date < BB1live[, min(date)],.(date, return, type = "Backtest")], BB1live[,.(date, return = PnL, type = "Live")])
+plotdata[!is.na(return), cumret := cumsum(return)]
+
+pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
+                            text = paste('Cummulative Return: ', round(cumret,2),
+                                         '<br>Date: ', as.Date(date))
+                            )
+              ) +
+  geom_line(aes(color = type)) +
+  ylab("Cummulative Return") +
+  xlab("") +
+  ggtitle("BB1 Equity Curve") +
+  scale_x_date(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255))) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+
+ggplotly(pic, tooltip = c("text")) %>%
+  layout(legend = list(orientation = "h", x = 0.4, y = -0.2))
+
+```
+
+
+## BB1 - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+meanrollingsharpe <- BB1returns[, mean(`rolling return`, na.rm = TRUE)]
+
+
+ggplot(BB1returns, aes(x=`rolling return`)) +
+  geom_histogram(aes(y=..density..), fill = rgb(255, 90, 52, maxColorValue = 255)) +
+  ylab("Probability Density") +
+  xlab("Rolling Return (%)") +
+  ggtitle("Histogram of BB1 12 month rolling return") +
+  scale_x_continuous(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  geom_vline(xintercept = meanrollingsharpe, color = rgb(5,61,96, maxColorValue = 255), linetype = "dashed", size = 1.5) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+```
+
+
+## BB1 - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+meanrollingsharpe <- BB1returns[, mean(`rolling Sharpe`, na.rm = TRUE)]
+
+ggplot(BB1returns, aes(x=`rolling Sharpe`)) +
+  geom_histogram(aes(y=..density..), fill = rgb(255, 90, 52, maxColorValue = 255)) +
+  ylab("Probability Density") +
+  xlab("Rolling Sharpe Ratio") +
+  ggtitle("Histogram of BB1 12 month rolling Sharpe Ratio") +
+  scale_x_continuous(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  geom_vline(xintercept = meanrollingsharpe, color = rgb(5,61,96, maxColorValue = 255), linetype = "dashed", size = 1.5) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+```
+
+
+
+
+
+
+## BB2 - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+BB2returns <- as.data.table(read_csv('C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/calendarPortfolio_EWMA_RSI.csv'))
+BB2returns[!is.na(return), cumret := cumsum(return)]
+
+BB2live <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/BB2returns.csv"))
+BB2live[, X1 := NULL]
+setnames(BB2live, "index", "date")
+
+
+```
+
+
+```{r}
+
+plotdata <- rbind(BB2returns[date < BB2live[, min(date)],.(date, return, type = "Backtest")], BB2live[,.(date, return = PnL, type = "Live")])
+plotdata[!is.na(return), cumret := cumsum(return)]
+
+pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
+                            text = paste('Cummulative Return: ', round(cumret,2),
+                                         '<br>Date: ', as.Date(date))
+                            )
+              ) +
+  geom_line(aes(color = type)) +
+  ylab("Cummulative Return") +
+  xlab("") +
+  ggtitle("BB2 Equity Curve") +
+  scale_x_date(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255))) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+
+ggplotly(pic, tooltip = c("text")) %>%
+  layout(legend = list(orientation = "h", x = 0.4, y = -0.2))
+
+```
+
+## BB2 - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+meanrollingsharpe <- BB2returns[, mean(`rolling return`, na.rm = TRUE)]
+
+
+ggplot(BB2returns, aes(x=`rolling return`)) +
+  geom_histogram(aes(y=..density..), fill = rgb(255, 90, 52, maxColorValue = 255)) +
+  ylab("Probability Density") +
+  xlab("Rolling Return (%)") +
+  ggtitle("Histogram of BB2 12 month rolling return") +
+  scale_x_continuous(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  geom_vline(xintercept = meanrollingsharpe, color = rgb(5,61,96, maxColorValue = 255), linetype = "dashed", size = 1.5) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+```
+
+
+## BB2 - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+meanrollingsharpe <- BB2returns[, mean(`rolling Sharpe`, na.rm = TRUE)]
+
+ggplot(BB2returns, aes(x=`rolling Sharpe`)) +
+  geom_histogram(aes(y=..density..), fill = rgb(255, 90, 52, maxColorValue = 255)) +
+  ylab("Probability Density") +
+  xlab("Rolling Sharpe Ratio") +
+  ggtitle("Histogram of BB2 12 month rolling Sharpe Ratio") +
+  scale_x_continuous(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  geom_vline(xintercept = meanrollingsharpe, color = rgb(5,61,96, maxColorValue = 255), linetype = "dashed", size = 1.5) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+```
+
+
+
+## Systematic Carry - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+tbl1 <- table.AnnualizedReturns(BB1returns[, .(date, BB1 = return)])
+nms <- row.names(tbl1)
+tbl1 <- as.data.table(tbl1)
+tbl1[, variable := nms]
+
+BB1returns[, month := month(date)]
+BB1returns[, year := year(date)]
+BB1returns[, md := min(date), by = .(year, month)]
+
+monthlydata <- CalculateReturns(BB1returns[date == md,.(date, normalised)])
+monthlydata <- as.data.table(monthlydata)
+monthlydata[, sign := sign(normalised)]
+
+avgneg <- monthlydata[sign == -1, mean(normalised)]
+avgpos <- monthlydata[sign == 1, mean(normalised)]
+
+noneg <- nrow(monthlydata[sign == -1])
+nopos <- nrow(monthlydata[sign == 1])
+
+
+maxdraw <- maxDrawdown(as.xts(BB1returns[, .(date, return)]))[1]
+ret.maxdraw <- maxdraw/tbl1[variable == "Annualized Return", BB1]
+
+parttoadd <- data.table(
+  variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
+  BB1 = c(maxdraw, ret.maxdraw, nopos, noneg, avgpos, avgneg)
+)
+
+
+tbl1 <- rbind(tbl1, parttoadd)
+tbl1 <- tbl1[,.(variable, BB1)]
+tbl1[, BB1 := round(BB1, 3)]
+
+setnames(tbl1, "variable", "Statistic")
+
+##
+
+tbl2 <- table.AnnualizedReturns(BB2returns[, .(date, BB2 = return)])
+nms <- row.names(tbl2)
+tbl2 <- as.data.table(tbl2)
+tbl2[, variable := nms]
+
+BB2returns[, month := month(date)]
+BB2returns[, year := year(date)]
+BB2returns[, md := min(date), by = .(year, month)]
+
+monthlydata <- CalculateReturns(BB2returns[date == md,.(date, normalised)])
+monthlydata <- as.data.table(monthlydata)
+monthlydata[, sign := sign(normalised)]
+
+avgneg <- monthlydata[sign == -1, mean(normalised)]
+avgpos <- monthlydata[sign == 1, mean(normalised)]
+
+noneg <- nrow(monthlydata[sign == -1])
+nopos <- nrow(monthlydata[sign == 1])
+
+
+maxdraw <- maxDrawdown(as.xts(BB2returns[, .(date, return)]))[1]
+ret.maxdraw <- maxdraw/tbl2[variable == "Annualized Return", BB2]
+
+parttoadd <- data.table(
+  variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
+  BB2 = c(maxdraw, ret.maxdraw, nopos, noneg, avgpos, avgneg)
+)
+
+
+tbl2 <- rbind(tbl2, parttoadd)
+tbl2 <- tbl2[,.(variable, BB2)]
+tbl2[, BB2 := round(BB2, 3)]
+
+setnames(tbl2, "variable", "Statistic")
+
+
+tbl <- merge(tbl1, tbl2, by = "Statistic")
+
+
+formattable(tbl)
+
+```
+
+
+
+## Carry literature {data-background="img/BlueBackgroundWithOrange.png"}
+
+Literature on extracting carry from futures:
+
+- <a href="http://onlinelibrary.wiley.com/doi/10.1111/jofi.12096/full" target="_blank">An Anatomy of Commodity Futures Risk Premia - Szymanowska et al.</a>
+- <a href="http://www.sciencedirect.com/science/article/pii/S0140988305001027" target="_blank">Commodity convenience yield and risk premium determination - Wei and Zhu</a>
+- <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2298565" target="_blank">Carry - Koijen et al.</a>
+- <a href = "https://faculty.fuqua.duke.edu/~charvey/Research/Published_Papers/P91_The_strategic_and.pdf">The Strategic and Tactical Value of Commodity Futures - Erb and Harvey</a>
+
+
+Literature on applying machine learing techniques in algorithmic trading:
+
+- <a href = "https://www.amazon.com/Advances-Financial-Machine-Learning-Marcos-ebook/dp/B079KLDW21" target="_blank">Advanced in financial machine learning - Marcos López de Prado</a>
+- <a href = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3104816" target="_blank">The 10 Reasons Most Machine Learning Funds Fail</a>
+
+
+
+
+# Core Strategies - Trend  {data-background="img/background_mtns_1.png"}
+
+## Trend overview {data-background="img/BlueBackgroundWithOrange.png"}
+
+- Trend following is about absolute performance of each commodity
+- Identify trends over selection of time frames
+- Slowly build position as trend increases
+- Slowly exit position as trend decreases
+- 30 Commodities and 2 tenors
+
+
+## Trend - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+TR1returns <- as.data.table(read_csv('C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/trendPortfolioReturns.csv'))
+TR1returns <- TR1returns[ , .(date = X1, return = `percent return`/100)]
+TR1returns <- TR1returns[date >= "1998-01-02"]
+TR1returns[!is.na(return), cumret := cumsum(return)]
+
+
+TR1returns[, normalised := cumprod(1 + return)]
+startval <- TR1returns[1, normalised]
+TR1returns[, normalised := normalised/startval]
+
+TR1returns[, prevnorm := guyrot(normalised, 252)]
+TR1returns[1:252, prevnorm := NA]
+
+TR1returns[, `rolling return` := (normalised - prevnorm)/prevnorm * 100] 
+
+rllsd <- rollapply(TR1returns[, return], width = 252, FUN = sd)
+rllsd <- c(rep(NA, 251), rllsd)
+
+TR1returns[, `rolling risk` := rllsd * sqrt(252) * 100]
+TR1returns[, `rolling Sharpe` := `rolling return`/`rolling risk`]
+
+
+
+
+TR1live <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/TR1returns.csv"))
+TR1live[, X1 := NULL]
+setnames(TR1live, "index", "date")
+
+
+```
+
+
+```{r}
+
+plotdata <- rbind(TR1returns[date < TR1live[, min(date)],.(date, return, type = "Backtest")], TR1live[,.(date, return = PnL, type = "Live")])
+plotdata[!is.na(return), cumret := cumsum(return)]
+
+pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
+                            text = paste('Cummulative Return: ', round(cumret,2),
+                                         '<br>Date: ', as.Date(date))
+                            )
+              ) +
+  geom_line(aes(color = type)) +
+  ylab("Cummulative Return") +
+  xlab("") +
+  ggtitle("TR1 Equity Curve") +
+  scale_x_date(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255))) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+
+ggplotly(pic, tooltip = c("text")) %>%
+  layout(legend = list(orientation = "h", x = 0.4, y = -0.2))
+
+```
+
+## Trend - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+meanrollingsharpe <- TR1returns[, mean(`rolling return`, na.rm = TRUE)]
+
+
+ggplot(TR1returns, aes(x=`rolling return`)) +
+  geom_histogram(aes(y=..density..), fill = rgb(255, 90, 52, maxColorValue = 255)) +
+  ylab("Probability Density") +
+  xlab("Rolling Return (%)") +
+  ggtitle("Histogram of TR1 12 month rolling return") +
+  scale_x_continuous(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  geom_vline(xintercept = meanrollingsharpe, color = rgb(5,61,96, maxColorValue = 255), linetype = "dashed", size = 1.5) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+```
+
+
+## Trend - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+meanrollingsharpe <- TR1returns[, mean(`rolling Sharpe`, na.rm = TRUE)]
+
+ggplot(TR1returns, aes(x=`rolling Sharpe`)) +
+  geom_histogram(aes(y=..density..), fill = rgb(255, 90, 52, maxColorValue = 255)) +
+  ylab("Probability Density") +
+  xlab("Rolling Sharpe Ratio") +
+  ggtitle("Histogram of TR1 12 month rolling Sharpe Ratio") +
+  scale_x_continuous(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  geom_vline(xintercept = meanrollingsharpe, color = rgb(5,61,96, maxColorValue = 255), linetype = "dashed", size = 1.5) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+```
+
+
+## Trend - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+tbl1 <- table.AnnualizedReturns(TR1returns[, .(date, TR1 = return)])
+nms <- row.names(tbl1)
+tbl1 <- as.data.table(tbl1)
+tbl1[, variable := nms]
+
+TR1returns[, month := month(date)]
+TR1returns[, year := year(date)]
+TR1returns[, md := min(date), by = .(year, month)]
+
+monthlydata <- CalculateReturns(TR1returns[date == md,.(date, normalised)])
+monthlydata <- as.data.table(monthlydata)
+monthlydata[, sign := sign(normalised)]
+
+avgneg <- monthlydata[sign == -1, mean(normalised)]
+avgpos <- monthlydata[sign == 1, mean(normalised)]
+
+noneg <- nrow(monthlydata[sign == -1])
+nopos <- nrow(monthlydata[sign == 1])
+
+
+maxdraw <- maxDrawdown(as.xts(BB1returns[, .(date, return)]))[1]
+ret.maxdraw <- maxdraw/tbl1[variable == "Annualized Return", TR1]
+
+parttoadd <- data.table(
+  variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
+  TR1 = c(maxdraw, ret.maxdraw, nopos, noneg, avgpos, avgneg)
+)
+
+
+tbl1 <- rbind(tbl1, parttoadd)
+tbl1 <- tbl1[,.(variable, TR1)]
+tbl1[, TR1 := round(TR1, 3)]
+
+setnames(tbl1, "variable", "Statistic")
+
+formattable(tbl1)
+
+```
+
+
+
+## Trend literature {data-background="img/BlueBackgroundWithOrange.png"}
+
+- <a href = "https://faculty.fuqua.duke.edu/~charvey/Research/Published_Papers/P91_The_strategic_and.pdf" target="_blank">The Strategic and Tactical Value of Commodity Futures - Erb and Harvey</a>
+- <a href = "http://faculty.som.yale.edu/garygorton/documents/fundamentals_Jan2012_FINAL.pdf" target="_blank">The fundamentals of Commodity Futures Returns</a>
+- <a href = "http://pages.stern.nyu.edu/~lpederse/papers/TimeSeriesMomentum.pdf" target="_blank">Time series momentum - Moskowitz et al.</a>
+- <a href = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2603731" target="_blank">Which trend is your friend - Levine and Pedersen</a>
+- <a href = "https://www.amazon.com/Trend-Following-Managed-Futures-Trading/dp/1118890973" target="_blank">Trend Following with Managed Futures - Greyserman and Kaminski</a>
+
+
+
+
+
+
+
+# Core Strategies - Relative Roll {data-background="img/background_mtns_1.png"}
+
+## Relative Roll overview {data-background="img/BlueBackgroundWithOrange.png"}
+
+Strategy not yet live.
+
+
+## Relative Roll literature {data-background="img/BlueBackgroundWithOrange.png"}
+
+- <a href = "https://www.nber.org/papers/w7032.pdf" target="_blank">Pairs Trading: Performance of a Relative Value Arbitrage Rule - Gatev et al.</a>
+- <a href = "https://books.google.co.uk/books?hl=en&lr=&id=yK2mvtpcumcC&oi=fnd&pg=PR5&dq=Pairs+Trading:+Quantitative+Methods+and+Analysis&ots=bUwnOD9XTA&sig=604hSkiMkxh7kzqtsG_Ze2w_eno&redir_esc=y" target="_blank">Pairs Trading - Vidyamurthy</a>
+- <a href = "http://statistik.econ.kit.edu/download/doc_secure1/ptem342v144techreport.pdf">The Application of Pairs Trading to Energy Futures Markets - Kanamura et al.</a>
+
+
+
+
+# Core Strategies - Sentiment {data-background="img/background_mtns_1.png"}
+
+## Sentiment overview {data-background="img/BlueBackgroundWithOrange.png"}
+
+Strategy not yet live.
+
+
+
+## Sentiment literature {data-background="img/BlueBackgroundWithOrange.png"}
+
+- <a href = "https://www.ravenpack.com/" target="_blank">Machine learning and event detection for trading energy and metals futures - Hafez et al.</a>
+- <a href = "https://www.ravenpack.com/" target="_blank">JP Morgan:  Using Ravenpack sentiment for cross asset style timing - Hafez et al.</a>
+- <a href = "https://efmaefm.org/0EFMAMEETINGS/EFMA%20ANNUAL%20MEETINGS/2017-Athens/papers/EFMA2017_0513_fullpaper.pdf" target="_blank">Macro Fundamentals or Geopolitical Events? A Textual Analysis of News Events for Crude Oil - Brandt and Gao</a>
+
+
+
+
+# Quantitative Portfolio {data-background="img/background_mtns_1.png"}
+
+## Investment Thesis {data-background="img/BlueBackgroundWithOrange.png"}
+
+- Focus on the intersection of technolody, data and behavioral finance applied to the broad commodity space
+- Build strategies based on sound economic theory to help deliver long-term repeatable results.  Inspired by
+    - academic and
+    - proprietary research.
+- Investment process built on the scientific method consisting of the systematic
+    - observation,
+    - measurement, 
+    - experiment,
+    - hypothesis formulation,
+    - testing and
+    - modification of hypothesis
+
+
+## Quantitative Portfolio - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+bb1 <- BB1returns[, .(date, BB1 = return)]
+bb2 <- BB2returns[, .(date, BB2 = return)]
+tr1 <- TR1returns[, .(date, TR1 = return)]
+
+returns <- merge(bb1, bb2, by = "date", all = TRUE)
+returns <- merge(returns, tr1, by = "date", all = TRUE)
+
+#returns[, portfolio := BB1 * 0.3 + BB2 * 0.5 + TR1 * 0.2]
+returns[, portfolio := BB1 * 0 + BB2 * 0.5 + TR1 * 0.5]
+
+## perform a couple calcs
+portfolio <- returns[ , .(date, return = portfolio)]
+
+portfolio <- portfolio[!is.na(return)]
+
+portfolio[, cumret := cumsum(return)]
+
+
+portfolio[, normalised := cumprod(1 + return)]
+startval <- portfolio[1, normalised]
+portfolio[, normalised := normalised/startval]
+
+portfolio[, prevnorm := guyrot(normalised, 252)]
+portfolio[1:252, prevnorm := NA]
+
+portfolio[, `rolling return` := (normalised - prevnorm)/prevnorm * 100] 
+
+rllsd <- rollapply(portfolio[, return], width = 252, FUN = sd)
+rllsd <- c(rep(NA, 251), rllsd)
+
+portfolio[, `rolling risk` := rllsd * sqrt(252) * 100]
+portfolio[, `rolling Sharpe` := `rolling return`/`rolling risk`]
+
+
+```
+
+
+```{r}
+
+bb1live <- BB1live[, .(date, BB1 = PnL)]
+bb2live <- BB2live[, .(date, BB2 = PnL)]
+tr1live <- TR1live[, .(date, TR1 = PnL)]
+
+portfoliolive <- merge(bb1live, bb2live, by = "date", all = TRUE) 
+portfoliolive <- merge(portfoliolive, tr1live, by = "date", all = TRUE)
+portfoliolive[, number := as.integer(!is.na(BB1)) + as.integer(!is.na(BB2)) + as.integer(!is.na(TR1))]
+portfoliolive <- portfoliolive[number > 0]
+
+portfoliolive[, BB1weight := ifelse(number < 3, 1/number, 0.3)]
+
+portfoliolive[, BB2weight := ifelse(number < 3, 1/number, 0.5)]
+portfoliolive[, BB2weight := ifelse(number == 1, 0, BB2weight)]
+
+portfoliolive[, TR1weight := ifelse(number < 3, 0, 0.2)]
+
+portfoliolive[, BB1 := ifelse(is.na(BB1), 0, BB1)]
+portfoliolive[, BB2 := ifelse(is.na(BB2), 0, BB2)]
+portfoliolive[, TR1 := ifelse(is.na(TR1), 0, TR1)]
+
+portfoliolive[, PnL := BB1 * BB1weight + BB2 * BB2weight + TR1 * TR1weight]
+
+```
+
+
+
+```{r}
+
+plotdata <- rbind(portfolio[date < portfoliolive[, min(date)],.(date, return, type = "Backtest")], portfoliolive[,.(date, return = PnL, type = "Live")])
+plotdata[!is.na(return), cumret := cumsum(return)]
+
+pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
+                            text = paste('Cummulative Return: ', round(cumret,2),
+                                         '<br>Date: ', as.Date(date))
+                            )
+              ) +
+  geom_line(aes(color = type)) +
+  ylab("Cummulative Return") +
+  xlab("") +
+  ggtitle("Polar Star Quantitative Commodity Fund Equity Curve") +
+  scale_x_date(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255))) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+
+ggplotly(pic, tooltip = c("text")) %>%
+  layout(legend = list(orientation = "h", x = 0.4, y = -0.2))
+
+```
+
+
+
+## Quantitative Portfolio - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+meanrollingsharpe <- portfolio[, mean(`rolling return`, na.rm = TRUE)]
+
+
+ggplot(portfolio, aes(x=`rolling return`)) +
+  geom_histogram(aes(y=..density..), fill = rgb(255, 90, 52, maxColorValue = 255)) +
+  ylab("Probability Density") +
+  xlab("Rolling Return (%)") +
+  ggtitle("Histogram of Polar Star Quantitative Commodity Fund 12 month rolling return") +
+  scale_x_continuous(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  geom_vline(xintercept = meanrollingsharpe, color = rgb(5,61,96, maxColorValue = 255), linetype = "dashed", size = 1.5) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 13, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+```
+
+
+## Quantitative Portfolio - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+meanrollingsharpe <- portfolio[, mean(`rolling Sharpe`, na.rm = TRUE)]
+
+ggplot(portfolio, aes(x=`rolling Sharpe`)) +
+  geom_histogram(aes(y=..density..), fill = rgb(255, 90, 52, maxColorValue = 255)) +
+  ylab("Probability Density") +
+  xlab("Rolling Sharpe Ratio") +
+  ggtitle("Histogram of Polar Star Quantitative Commodity Fund 12 month rolling Sharpe Ratio") +
+  scale_x_continuous(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  geom_vline(xintercept = meanrollingsharpe, color = rgb(5,61,96, maxColorValue = 255), linetype = "dashed", size = 1.5) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 12, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+
+```
+
+
+## Quantitative Portfolio - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+tbldata <- rbind(portfolio[,.(date, return)], portfoliolive[, .(date, return = PnL)])
+tbldata[, month := month(date)]
+tbldata[, year := year(date)]
+tbldata[, cumret := cumprod(return + 1)]
+tbldata[, cumret := cumret/tbldata[1, cumret]]
+tbldata[, md := min(date), by = .(year, month)]
+
+monthlydata <- CalculateReturns(tbldata[date == md,.(date, cumret)])
+monthlydata <- as.data.table(monthlydata)
+monthlydata[, sign := sign(cumret)]
+
+avgneg <- monthlydata[sign == -1, mean(cumret)]
+avgpos <- monthlydata[sign == 1, mean(cumret)]
+
+noneg <- nrow(monthlydata[sign == -1])
+nopos <- nrow(monthlydata[sign == 1])
+
+
+tbl1 <- table.AnnualizedReturns(tbldata[, .(date, `1998-` = return)])
+nms <- row.names(tbl1)
+tbl1 <- as.data.table(tbl1)
+tbl1[, variable := nms]
+
+maxdraw <- maxDrawdown(as.xts(tbldata[, .(date, return)]))[1]
+ret.maxdraw <- maxdraw/tbl1[variable == "Annualized Return", `1998-`]
+
+parttoadd <- data.table(
+  variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
+  `1998-` = c(maxdraw, ret.maxdraw, nopos, noneg, avgpos, avgneg)
+)
+
+tbl1 <- rbind(tbl1, parttoadd)
+tbl1 <- tbl1[,.(variable, `1998-`)]
+tbl1[, `1998-` := round(`1998-`, 3)]
+
+setnames(tbl1, "variable", "Statistic")
+
+
+##
+
+tbl2 <- table.AnnualizedReturns(tbldata[date >= "2008-01-01", .(date, `2008-` = return)])
+nms <- row.names(tbl2)
+tbl2 <- as.data.table(tbl2)
+tbl2[, variable := nms]
+
+maxdraw <- maxDrawdown(as.xts(tbldata[date >= "2008-01-01", .(date, return)]))[1]
+ret.maxdraw <- maxdraw/tbl2[variable == "Annualized Return", `2008-`]
+
+avgneg <- monthlydata[sign == -1 & index >= "2008-01-01", mean(cumret)]
+avgpos <- monthlydata[sign == 1 & index >= "2008-01-01", mean(cumret)]
+
+noneg <- nrow(monthlydata[sign == -1 & index >= "2008-01-01"])
+nopos <- nrow(monthlydata[sign == 1 & index >= "2008-01-01"])
+
+
+parttoadd <- data.table(
+  variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
+  `2008-` = c(maxdraw, ret.maxdraw, nopos, noneg, avgpos, avgneg)
+)
+
+
+tbl2 <- rbind(tbl2, parttoadd)
+tbl2 <- tbl2[,.(variable, `2008-`)]
+tbl2[, `2008-` := round(`2008-`, 3)]
+
+setnames(tbl2, "variable", "Statistic")
+
+
+##
+
+
+tbl3 <- table.AnnualizedReturns(tbldata[date >= "2015-01-01", .(date, `2015-` = return)])
+nms <- row.names(tbl3)
+tbl3 <- as.data.table(tbl3)
+tbl3[, variable := nms]
+
+maxdraw <- maxDrawdown(as.xts(tbldata[date >= "2015-01-01", .(date, return)]))[1]
+ret.maxdraw <- maxdraw/tbl3[variable == "Annualized Return", `2015-`]
+
+avgneg <- monthlydata[sign == -1 & index >= "2015-01-01", mean(cumret)]
+avgpos <- monthlydata[sign == 1 & index >= "2015-01-01", mean(cumret)]
+
+noneg <- nrow(monthlydata[sign == -1 & index >= "2015-01-01"])
+nopos <- nrow(monthlydata[sign == 1 & index >= "2015-01-01"])
+
+
+parttoadd <- data.table(
+  variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
+  `2015-` = c(maxdraw, ret.maxdraw, nopos, noneg, avgpos, avgneg)
+)
+
+
+tbl3 <- rbind(tbl3, parttoadd)
+tbl3 <- tbl3[,.(variable, `2015-`)]
+tbl3[, `2015-` := round(`2015-`, 3)]
+
+setnames(tbl3, "variable", "Statistic")
+
+
+##
+
+
+tbl <- merge(tbl1, tbl2, by = "Statistic")
+tbl <- merge(tbl, tbl3, by = "Statistic")
+
+formattable(tbl)
+
+```
+
+
+# Polar Star Multi Strategy Portfolio {data-background="img/background_mtns_1.png"}
+
+## Polar Star Products and S&P500 {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+together <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/together.csv"))
+together <- together[order(date)]
+
+together[, PSLtd := cumprod(1+PSLtd)]
+together[, PSQCF := cumprod(1+PSQCF)]
+together[, SnP := cumprod(1+SnP)]
+
+together[, PSLtd := PSLtd/together[1, PSLtd]]
+together[, PSQCF := PSQCF/together[1, PSQCF]]
+together[, SnP := SnP/together[1, SnP]]
+
+plotdata <- melt(together, id.vars = "date")
+plotdata <- plotdata[order(date)]
+
+
+ggplot(plotdata, aes(x=date, y=value, group = variable,
+                     text = paste('Cummulative Return: ', round(value,2),
+                                  '<br>Date: ', as.Date(date))
+                     )
+       ) +
+  geom_line(aes(group = variable, color = variable)) +
+  ylab("Cummulative Return") +
+  xlab("") +
+  ggtitle("Polar Star Quantitative Commodity Fund, Ltd an S&P500 Equity Curves") +
+  scale_x_date(breaks = pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 12, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+
+
+```
+
+
+
+## Combine Discretionary and Systematic Portfolios {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+together <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/together.csv"))
+
+
+returns <- as.xts(together[,.(date, PSLtd, PSQCF)])
+
+portion <- seq(0, 1, 0.01)
+
+part <- vector(mode = "list", length = length(portion))
+for(i in 1:length(portion)){
+  #i=1
+  tempret <- Return.portfolio(returns, weights = c(portion[i], 1-portion[i]))
+  tempret <- as.data.table(tempret)
+  tempret[, PS_ratio := portion[i]]
+  part[[i]] <- tempret  
+}
+
+allparts <- rbindlist(part)
+allparts[, label := paste("Polar Star", PS_ratio * 100)]
+
+widedata <- dcast(allparts, index ~ label, value.var = "portfolio.returns")
+widedata <- as.xts(widedata)
+
+
+cols <- paste("Polar Star", seq(0, 100, 10))
+
+draws <- maxDrawdown(widedata)
+stdevs <- StdDev(widedata)
+
+annData <- table.AnnualizedReturns(widedata, scale = 12, digits = 8)
+annData <- as.data.table(annData[1,])
+annData <- rbind(annData, stdevs, draws)
+annData[, variable := c("Annualised Return", "Standard Deviation", "Worst Drawdown")]
+
+
+plotdata <- melt(annData, id.vars = "variable", variable.name = "PSFraction")
+plotdata <- dcast(plotdata, PSFraction ~ variable, value.var = "value")
+setnames(plotdata, names(plotdata), gsub(" ", "_", names(plotdata)))
+plotdata[, Annualised_Return := Annualised_Return * 100]
+plotdata[, Standard_Deviation := Standard_Deviation * 100]
+plotdata[, Worst_Drawdown := Worst_Drawdown * 100]
+plotdata[, marker := tstrsplit(PSFraction ,"Star", keep = 2)]
+plotdata[, marker := as.integer(marker)]
+plotdata <- plotdata[order(marker)]
+plotdata[, group := ifelse(marker %% 10 == 0, "A", "B")]
+plotdata[, PSFraction := paste0(PSFraction, "%")]
+
+plotdata[, PSFraction := gsub("Polar Star", "PS Ltd", PSFraction)]
+
+```
+
+
+```{r}
+
+ggplot(plotdata, aes(x=Standard_Deviation, y=Annualised_Return)) +
+  geom_point(aes(color = group, size = group)) +
+  geom_text(data = plotdata[group == "A"], 
+            aes(label = PSFraction), nudge_x = 0.15, size = 4.5, colour = rgb(5,61,96, maxColorValue = 255) ) +
+  ylab("Annualised Return") +
+  xlab("Standard Deviation") +
+  ggtitle("Polar Star Ltd and Polar Star Quantitiave Commodity Fund Efficeint Frontier") +
+  scale_size_manual(values = c(5, 1), guide=FALSE) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), "gray"), guide=FALSE) +
+  scale_x_continuous(breaks = pretty_breaks(n = 10), expand = c(.1, 0)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 12, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+
+
+```
+
+
+
+
+
+## Polar Star Multi Strategy as enhancement to S&P500 {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+allPortfolios <- together[, .(date, `50-50` = PSLtd * 0.5 + PSQCF * 0.5, SnP, PSLtd, PSQCF)]
+
+
+returns <- as.xts(allPortfolios[,.(date, `50-50`, SnP)])
+
+portion <- seq(0, 1, 0.01)
+
+part <- vector(mode = "list", length = length(portion))
+for(i in 1:length(portion)){
+  #i=1
+  tempret <- Return.portfolio(returns, weights = c(portion[i], 1-portion[i]))
+  tempret <- as.data.table(tempret)
+  tempret[, PS_ratio := portion[i]]
+  part[[i]] <- tempret  
+}
+
+allparts <- rbindlist(part)
+allparts[, label := paste("Polar Star", PS_ratio * 100)]
+
+widedata <- dcast(allparts, index ~ label, value.var = "portfolio.returns")
+widedata <- as.xts(widedata)
+
+
+cols <- paste("Polar Star", seq(0, 100, 10))
+
+draws <- maxDrawdown(widedata)
+stdevs <- StdDev(widedata)
+
+annData <- table.AnnualizedReturns(widedata, scale = 12, digits = 8)
+annData <- as.data.table(annData[1,])
+annData <- rbind(annData, stdevs, draws)
+annData[, variable := c("Annualised Return", "Standard Deviation", "Worst Drawdown")]
+
+
+plotdata <- melt(annData, id.vars = "variable", variable.name = "PSFraction")
+plotdata <- dcast(plotdata, PSFraction ~ variable, value.var = "value")
+setnames(plotdata, names(plotdata), gsub(" ", "_", names(plotdata)))
+plotdata[, Annualised_Return := Annualised_Return * 100]
+plotdata[, Standard_Deviation := Standard_Deviation * 100]
+plotdata[, Worst_Drawdown := Worst_Drawdown * 100]
+plotdata[, marker := tstrsplit(PSFraction ,"Star", keep = 2)]
+plotdata[, marker := as.integer(marker)]
+plotdata <- plotdata[order(marker)]
+plotdata[, group := ifelse(marker %% 10 == 0, "A", "B")]
+plotdata[, PSFraction := paste0(PSFraction, "%")]
+
+plotdata[, PSFraction := gsub("Polar Star", "PS Multi Strat", PSFraction)]
+
+
+```
+
+
+```{r}
+
+ggplot(plotdata, aes(x=Standard_Deviation, y=Annualised_Return)) +
+  geom_point(aes(color = group, size = group)) +
+  geom_text(data = plotdata[group == "A"], 
+            aes(label = PSFraction), nudge_x = 0.25, size = 4.5, colour = rgb(5,61,96, maxColorValue = 255) ) +
+  ylab("Annualised Return") +
+  xlab("Standard Deviation") +
+  ggtitle("Polar Star Multi Strategy and S&P500 Efficeint Frontier") +
+  scale_size_manual(values = c(5, 1), guide=FALSE) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), "gray"), guide=FALSE) +
+  scale_x_continuous(breaks = pretty_breaks(n = 10), expand = c(.1, 0)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 12, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+
+
+```
+
+
+
+
+## Portfolio Comparison {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+allPortfolios[, `PS Multi Strategy and S&P500` := `50-50` * 0.5 + SnP * 0.5]
+setnames(allPortfolios, c("50-50", "SnP"), c("PS Multi Strategy","S&P500"))
+
+
+monthlydata <- as.xts(allPortfolios)
+monthlydata <- as.data.table(monthlydata)
+monthlydata <- melt(monthlydata, id.vars = "index", variable.name = "Portfolio", value.name = "Return")
+monthlydata[, sign := sign(Return)]
+
+avgrets <- monthlydata[, .(avgret = mean(Return), .N), by = .(Portfolio, sign)]
+
+numbers <- dcast(avgrets, sign ~ Portfolio, value.var = "N")
+numbers[, variable := ifelse(sign == -1, "Number of Negative Months", "Number of Positive Months")]
+numbers[, sign := NULL]
+
+posnegrets <- dcast(avgrets, sign ~ Portfolio, value.var = "avgret")
+posnegrets[, variable := ifelse(sign == -1, "Avereage Negative Month Return", "Average Positive Month Return")]
+posnegrets[, sign := NULL]
+
+tbl1 <- table.AnnualizedReturns(as.xts(allPortfolios))
+maxdraw <- maxDrawdown(as.xts(allPortfolios))
+
+tbl1 <- rbind(tbl1, maxdraw)
+nms <- row.names(tbl1)
+tbl1 <- as.data.table(tbl1)
+tbl1[, variable := nms]
+
+tbl <- rbind(tbl1, numbers, posnegrets)
+setnames(tbl, "variable", "Statistic")
+
+tempdata <- melt(tbl, id.vars = "Statistic", variable.name = "Portfolio")
+tempdata[, value := round(value, 3)]
+
+tbl <- dcast(tempdata, Statistic ~ Portfolio, value.var = "value")
+tbl <- tbl[, .(Statistic, `S&P500`, `PS Multi Strategy`, `PS Multi Strategy and S&P500`)]
+
+
+formattable(tbl)
+
+```
+
+
+# Summary {data-background="img/background_mtns_1.png"}
+
+
+## {data-background="img/BlueBackgroundWithOrange.png"}
+
+Combining a 
+
+* discretionary and 
+* systematic approach 
+
+to investing in commodities we create a product with
+
+* positive expected return which is
+* uncorrelated to equities
+
+that gives superior risk adjusted returns.
+
