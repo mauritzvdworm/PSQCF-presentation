@@ -35,6 +35,7 @@ library(extrafont)
 library(scales)
 library(PortfolioAnalytics)
 library(formattable)
+library(tseries)
 
 loadfonts(device = "win")
 
@@ -212,7 +213,19 @@ ggplotly(pic)
 ```
 
 
+## Where are the opportunities?  {data-background="img/BlueBackgroundWithOrange.png"}
 
+- Limited, Local, Spectrum
+    - Less liquid parts of the curve
+    - Changes to makro
+    - Concentrated risk on asymmetric risk/reward trades
+    
+</br>
+
+- Quantitative
+    - Harvest systematic risk premium from large universe of commodities
+    - Rule based decision making process
+    - Strategies inspired by descretional methodology
 
 
 ## Literature  {data-background="img/BlueBackgroundWithOrange.png"}
@@ -353,6 +366,8 @@ of Investment Management - JP Morgan US Equity Quantitative Research</a>
     - We require long time series data
     - Futures expire too soon to gather sufficient data
     - How do you handle rolls?
+
+</br>    
     
 - Non-stationarity of Price Data
     - Time series data can only reliably be forecasted if stationary
@@ -397,7 +412,7 @@ pic <- ggplot(contPrices[comdty == "C" & tenure == "F3"],
   )
 
 
-ggplotly(pic)%>%
+ggplotly(pic) %>%
   layout(legend = list(orientation = "h", x = 0.4, y = -0.2))
 
 ```
@@ -442,6 +457,76 @@ ggplotly(pic)%>%
 
 ```
 
+
+## Stationarity {data-background="img/BlueBackgroundWithOrange.png"} 
+
+```{r}
+
+plotdata <- contPrices[comdty == "C" & 
+                         tenure == "F3" &
+                         index >= "1990-01-01" &
+                         index < "1992-01-01", .(`Non Stationary` = frontRP)]
+plotdata[, index := 1:nrow(plotdata)]
+
+plotdata[, Stationary := diff(`Non Stationary`)/`Non Stationary`]
+plotdata[, Stationary := guyrot(Stationary, 1)]
+plotdata[1, Stationary := NA]
+plotdata[, Stationary := Stationary * 10]
+plotdata[, `Non Stationary` := `Non Stationary` * 2 - 1]
+
+plotdata <- melt(plotdata, id.vars = c("index"))
+
+adfData <- plotdata[!is.na(value), adf.test(value), by = variable]
+adfData <- adfData[,.(variable, statistic, p.value)]
+adfData[, statistic := round(statistic, 3)]
+adfData[, p.value := round(p.value, 3)]
+
+ggplot(plotdata, aes(x=index, y=value)) +
+  geom_line(aes(group = variable, color = variable)) +
+  theme_bw() +
+  xlab("") +
+  ylab("Price") +
+  geom_text(label = paste("adf:", adfData[variable == "Non Stationary", statistic]), x = 450, y = 1, color = rgb(5,61,96, maxColorValue = 255)) +
+  geom_text(label = paste("adf:", adfData[variable == "Stationary", statistic]), x = 450, y = 0.25, color = rgb(255, 90, 52, maxColorValue = 255)) +
+  ggtitle("Stationary and Non Stationary Time Series - Threshold = -2.8623") +
+  #scale_x_date(breaks = pretty_breaks(n=10)) +
+  scale_color_manual(values = c(rgb(5,61,96, maxColorValue = 255), rgb(255, 90, 52, maxColorValue = 255))) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 14, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+
+
+```
+
+## Stationarity {data-background="img/BlueBackgroundWithOrange.png"} 
+
+How to obtain a stationary time series
+
+</br>
+
+- Traditional
+    - Price differences
+    - Returns
+    - Memory loss
+
+</br>
+
+- Modern
+    - Fractional differences
+    - Memory present
 
 ## Stationarity {data-background="img/BlueBackgroundWithOrange.png"} 
 
@@ -560,18 +645,30 @@ ggplotly(pic)%>%
 ## Flavours of carry {data-background="img/BlueBackgroundWithOrange.png"}
 
 - **Closer to discretionary methodology - BB1**
-    - 25 commodities and 2 tenors
+    - 30 commodities and 2 tenors
     - Sizing determined using percentile methodology
     - Risk 0.5% of strategy NAV per trade
     - Monthly rebalance
 
+</br>
 
 - **More modern - BB2**
-    - 25 commodities and 2 tenors
+    - 30 commodities and 2 tenors
     - Fractionally differenced time-series
     - Meta labelling
     - Ensemble machine learning
     - Deterine probability of profitable trade and size trade accordingly
+
+
+## Backtest Assumptions {data-background="img/BlueBackgroundWithOrange.png"}
+
+- $10 Round trip of each contract
+- Slippage of 1 tick per contract
+
+</br>
+
+- Entry cost of one spread $= \text{\$}10 + 2 \text{ ticks} \times \text{multiplier}$
+- Exit cost of one spread $= \text{\$}10 + 2 \text{ ticks} \times \text{multiplier}$
 
 
 ## BB1 - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
@@ -917,7 +1014,7 @@ Literature on applying machine learing techniques in algorithmic trading:
 - Identify trends over selection of time frames
 - Slowly build position as trend increases
 - Slowly exit position as trend decreases
-- 30 Commodities and 2 tenors
+- 35 Commodities and 2 tenors
 
 
 ## Trend - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
@@ -1206,27 +1303,31 @@ portfolio[, `rolling Sharpe` := `rolling return`/`rolling risk`]
 
 ```{r}
 
-bb1live <- BB1live[, .(date, BB1 = PnL)]
-bb2live <- BB2live[, .(date, BB2 = PnL)]
-tr1live <- TR1live[, .(date, TR1 = PnL)]
+# bb1live <- BB1live[, .(date, BB1 = PnL)]
+# bb2live <- BB2live[, .(date, BB2 = PnL)]
+# tr1live <- TR1live[, .(date, TR1 = PnL)]
+# 
+# portfoliolive <- merge(bb1live, bb2live, by = "date", all = TRUE) 
+# portfoliolive <- merge(portfoliolive, tr1live, by = "date", all = TRUE)
+# portfoliolive[, number := as.integer(!is.na(BB1)) + as.integer(!is.na(BB2)) + as.integer(!is.na(TR1))]
+# portfoliolive <- portfoliolive[number > 0]
+# 
+# portfoliolive[, BB1weight := ifelse(number < 3, 1/number, 0.3)]
+# 
+# portfoliolive[, BB2weight := ifelse(number < 3, 1/number, 0.5)]
+# portfoliolive[, BB2weight := ifelse(number == 1, 0, BB2weight)]
+# 
+# portfoliolive[, TR1weight := ifelse(number < 3, 0, 0.2)]
+# 
+# portfoliolive[, BB1 := ifelse(is.na(BB1), 0, BB1)]
+# portfoliolive[, BB2 := ifelse(is.na(BB2), 0, BB2)]
+# portfoliolive[, TR1 := ifelse(is.na(TR1), 0, TR1)]
+# 
+# portfoliolive[, PnL := BB1 * BB1weight + BB2 * BB2weight + TR1 * TR1weight]
 
-portfoliolive <- merge(bb1live, bb2live, by = "date", all = TRUE) 
-portfoliolive <- merge(portfoliolive, tr1live, by = "date", all = TRUE)
-portfoliolive[, number := as.integer(!is.na(BB1)) + as.integer(!is.na(BB2)) + as.integer(!is.na(TR1))]
-portfoliolive <- portfoliolive[number > 0]
 
-portfoliolive[, BB1weight := ifelse(number < 3, 1/number, 0.3)]
-
-portfoliolive[, BB2weight := ifelse(number < 3, 1/number, 0.5)]
-portfoliolive[, BB2weight := ifelse(number == 1, 0, BB2weight)]
-
-portfoliolive[, TR1weight := ifelse(number < 3, 0, 0.2)]
-
-portfoliolive[, BB1 := ifelse(is.na(BB1), 0, BB1)]
-portfoliolive[, BB2 := ifelse(is.na(BB2), 0, BB2)]
-portfoliolive[, TR1 := ifelse(is.na(TR1), 0, TR1)]
-
-portfoliolive[, PnL := BB1 * BB1weight + BB2 * BB2weight + TR1 * TR1weight]
+portfoliolive <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
+portfoliolive <- portfoliolive[,.(date, PnL = PSQCF)]
 
 ```
 
@@ -1272,6 +1373,46 @@ ggplotly(pic, tooltip = c("text")) %>%
 ```
 
 
+## Quantitative Portfolio - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+
+```{r}
+
+portfolioReturns <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
+
+
+rebaldates <- as.Date(c("2018-07-03", "2018-08-02", "2018-09-05", "2018-10-02", "2018-11-02", "2018-12-02"))
+
+ggplot(portfolioReturns, aes(x=date, y=normalized)) +
+  geom_line(color = rgb(5,61,96, maxColorValue = 255), size = 1.2) +
+  theme_bw() +
+  scale_x_date(breaks = pretty_breaks(10)) +
+  scale_y_continuous(breaks = pretty_breaks(10)) +
+  ylab("Cummulative Return (%)") +
+  #geom_text(data = portfolioReturns[date == max(date) | date %in% rebaldates], aes(label = round(normalized, 2)), nudge_y = 0.05) +
+  ggtitle("Polar Star Quantitative Commodity Portfolio") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = as.Date(rebaldates), linetype = "dashed") +
+  annotate(geom = "text", label = "Rebalance", x=as.Date(rebaldates), y=1.6, angle= 90)  +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+
+
+```
 
 ## Quantitative Portfolio - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
 
@@ -1468,12 +1609,12 @@ plotdata <- melt(together, id.vars = "date")
 plotdata <- plotdata[order(date)]
 
 
-ggplot(plotdata, aes(x=date, y=value, group = variable,
+pic <- ggplot(plotdata, aes(x=date, y=value, group = variable,
                      text = paste('Cummulative Return: ', round(value,2),
                                   '<br>Date: ', as.Date(date))
                      )
        ) +
-  geom_line(aes(group = variable, color = variable)) +
+  geom_line(aes(group = variable, color = variable), size = 1.2) +
   ylab("Cummulative Return") +
   xlab("") +
   ggtitle("Polar Star Quantitative Commodity Fund, Ltd an S&P500 Equity Curves") +
@@ -1496,6 +1637,8 @@ ggplot(plotdata, aes(x=date, y=value, group = variable,
   )
 
 
+ggplotly(pic) %>%
+  layout(legend = list(orientation = "h", x = 0.4, y = -0.2))
 
 ```
 
