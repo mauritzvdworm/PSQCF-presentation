@@ -377,6 +377,7 @@ of Investment Management - JP Morgan US Equity Quantitative Research</a>
 
 ## Continuous Futures Price Series {data-background="img/BlueBackgroundWithOrange.png"}
 
+
 ```{r}
 
 contPrices <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/CalendarPortfolio/contCalendarFracDiff.csv"))
@@ -642,9 +643,120 @@ ggplotly(pic)%>%
 - Extract roll yield with a short position in the near and a long position in the far dated contracts of the same commodity
 
 
+## Carry Example {data-background="img/BlueBackgroundWithOrange.png"}
+
+
+
+```{r}
+
+plotdata <- contPrices[comdty == "LH" & tenure == "F3", .(index, `Front Month Price` = frontRP, `Deferred Month Price` = deferredRP)]
+plotdata[, spread := `Deferred Month Price` - `Front Month Price`]
+plotdata <- melt(plotdata, id.vars = "index")
+
+plotdata[, year := year(index)]
+plotdata[, month := month(index)]
+plotdata[, md := max(index), by = .(year, month)]
+
+
+ggplot(plotdata[index == md & variable != "spread" &  index >= "2000-01-01"], aes(x=index, y=value)) +
+  geom_line(aes(group = variable, color = variable)) +
+  ggtitle("Lean Hog Front nd Deferred Contract ETF prices") +
+  theme_bw() +
+  scale_y_continuous(breaks = pretty_breaks(n=10)) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255))) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+
+
+
+```
+
+
+## Carry Example {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+plotdata <- contPrices[comdty == "LH" & tenure == "F3" & index >= "2000-01-01", .(index, frontRP, deferredRP)]
+plotdata <- melt(plotdata, id.vars = "index")
+
+plotdata[, year := year(index)]
+plotdata[, month := month(index)]
+
+
+s.data <- split(plotdata, list(plotdata$year, plotdata$variable))
+
+calculateRoll <- function(df){
+  #df = s.data[[1]]
+  start <- df[1, value]
+  df[, value := value/start]
+  df
+}
+
+yearData <- rbindlist(map(s.data, calculateRoll))
+
+tempdata <- dcast(yearData, index ~ variable, value.var = "value")
+tempdata[, value := deferredRP - frontRP]
+tempdata <- tempdata[, .(index, value, variable = "spread")]
+tempdata[, year := year(index)]
+tempdata[, month := month(index)]
+
+
+plotdata <- rbind(yearData, tempdata)
+
+plotdata[, day := substring(index, 9, 10)]
+plotdata[, date := paste(2000, month, day, sep="-")]
+plotdata[, date := as.Date(date)]
+
+meanSpreadData <- plotdata[variable == "spread", .(mean = mean(value), std = sd(value)), by = .(month)]
+meanSpreadData <- meanSpreadData[order(month)]
+  
+ggplot(meanSpreadData, aes(x=month, y=mean)) +
+  geom_line() +
+  ylab("Average Carry") +
+  xlab("Month") +
+  geom_errorbar(aes(ymin=mean-std, ymax=mean+std)) +
+  scale_x_continuous(breaks = pretty_breaks(n=10)) +
+  scale_y_continuous(breaks = pretty_breaks(n=10)) +
+  theme_bw() +
+  ggtitle("Lean Hog Average Yearly Carry") +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+
+```
+
+
+
 ## Flavours of carry {data-background="img/BlueBackgroundWithOrange.png"}
 
-- **Closer to discretionary methodology - BB1**
+- ** Carry - inspired by discretionary methodology (BB)1**
     - 30 commodities and 2 tenors
     - Sizing determined using percentile methodology
     - Risk 0.5% of strategy NAV per trade
@@ -652,7 +764,7 @@ ggplotly(pic)%>%
 
 </br>
 
-- **More modern - BB2**
+- ** Machine Learning Enhanced Carry (BB2)**
     - 30 commodities and 2 tenors
     - Fractionally differenced time-series
     - Meta labelling
@@ -1380,11 +1492,13 @@ ggplotly(pic, tooltip = c("text")) %>%
 
 portfolioReturns <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
 
+portfolioReturns <- portfolioReturns[, .(date, PSQCF = normalized, `S&P` = SnPnormalised)]
+portfolioReturns <- melt(portfolioReturns, id.vars=c("date"))
 
 rebaldates <- as.Date(c("2018-07-03", "2018-08-02", "2018-09-05", "2018-10-02", "2018-11-02", "2018-12-02"))
 
-ggplot(portfolioReturns, aes(x=date, y=normalized)) +
-  geom_line(color = rgb(5,61,96, maxColorValue = 255), size = 1.2) +
+ggplot(portfolioReturns, aes(x=date, y=value)) +
+  geom_line(aes(color = variable), size = 1.2) +
   theme_bw() +
   scale_x_date(breaks = pretty_breaks(10)) +
   scale_y_continuous(breaks = pretty_breaks(10)) +
@@ -1394,6 +1508,7 @@ ggplot(portfolioReturns, aes(x=date, y=normalized)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_vline(xintercept = as.Date(rebaldates), linetype = "dashed") +
   annotate(geom = "text", label = "Rebalance", x=as.Date(rebaldates), y=1.6, angle= 90)  +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255))) +
   theme(
     plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
     panel.background = element_rect(fill = "white"),
@@ -1413,6 +1528,8 @@ ggplot(portfolioReturns, aes(x=date, y=normalized)) +
 
 
 ```
+
+
 
 ## Quantitative Portfolio - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
 
