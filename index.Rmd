@@ -217,7 +217,7 @@ ggplotly(pic)
 
 - Limited, Local, Spectrum
     - Less liquid parts of the curve
-    - Changes to makro
+    - Changes to macro
     - Concentrated risk on asymmetric risk/reward trades
     
 </br>
@@ -225,7 +225,7 @@ ggplotly(pic)
 - Quantitative
     - Harvest systematic risk premium from large universe of commodities
     - Rule based decision making process
-    - Strategies inspired by descretional methodology
+    - Strategies inspired by discretional methodology
 
 
 ## Literature  {data-background="img/BlueBackgroundWithOrange.png"}
@@ -756,7 +756,7 @@ ggplot(meanSpreadData, aes(x=month, y=mean)) +
 
 ## Flavours of carry {data-background="img/BlueBackgroundWithOrange.png"}
 
-- ** Carry - inspired by discretionary methodology (BB)1**
+- **Carry - inspired by discretionary methodology (BB1)**
     - 30 commodities and 2 tenors
     - Sizing determined using percentile methodology
     - Risk 0.5% of strategy NAV per trade
@@ -764,7 +764,7 @@ ggplot(meanSpreadData, aes(x=month, y=mean)) +
 
 </br>
 
-- ** Machine Learning Enhanced Carry (BB2)**
+- **Machine Learning Enhanced Carry (BB2)**
     - 30 commodities and 2 tenors
     - Fractionally differenced time-series
     - Meta labelling
@@ -1031,21 +1031,23 @@ monthlydata <- CalculateReturns(BB1returns[date == md,.(date, normalised)])
 monthlydata <- as.data.table(monthlydata)
 monthlydata[, sign := sign(normalised)]
 
-avgneg <- monthlydata[sign == -1, mean(normalised)]
-avgpos <- monthlydata[sign == 1, mean(normalised)]
+avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
+avgpos <- monthlydata[sign == 1, mean(normalised) * 100]
 
 noneg <- nrow(monthlydata[sign == -1])
 nopos <- nrow(monthlydata[sign == 1])
 
 
-maxdraw <- maxDrawdown(as.xts(BB1returns[, .(date, return)]))[1]
-ret.maxdraw <- maxdraw/tbl1[variable == "Annualized Return", BB1]
+maxdraw <- maxDrawdown(as.xts(BB1returns[, .(date, return)]))[1] * 100
+ret.maxdraw <- maxdraw/tbl1[variable == "Annualized Return", BB1 * 100]
 
 parttoadd <- data.table(
   variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
   BB1 = c(maxdraw, ret.maxdraw, nopos, noneg, avgpos, avgneg)
 )
 
+
+tbl1[variable != "Annualized Sharpe (Rf=0%)", BB1 := BB1 * 100]
 
 tbl1 <- rbind(tbl1, parttoadd)
 tbl1 <- tbl1[,.(variable, BB1)]
@@ -1060,6 +1062,8 @@ nms <- row.names(tbl2)
 tbl2 <- as.data.table(tbl2)
 tbl2[, variable := nms]
 
+tbl2[variable != "Annualized Sharpe (Rf=0%)", BB2 := BB2 * 100]
+
 BB2returns[, month := month(date)]
 BB2returns[, year := year(date)]
 BB2returns[, md := min(date), by = .(year, month)]
@@ -1068,15 +1072,15 @@ monthlydata <- CalculateReturns(BB2returns[date == md,.(date, normalised)])
 monthlydata <- as.data.table(monthlydata)
 monthlydata[, sign := sign(normalised)]
 
-avgneg <- monthlydata[sign == -1, mean(normalised)]
-avgpos <- monthlydata[sign == 1, mean(normalised)]
+avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
+avgpos <- monthlydata[sign == 1, mean(normalised) * 100]
 
 noneg <- nrow(monthlydata[sign == -1])
 nopos <- nrow(monthlydata[sign == 1])
 
 
-maxdraw <- maxDrawdown(as.xts(BB2returns[, .(date, return)]))[1]
-ret.maxdraw <- maxdraw/tbl2[variable == "Annualized Return", BB2]
+maxdraw <- maxDrawdown(as.xts(BB2returns[, .(date, return)]))[1] * 100
+ret.maxdraw <- maxdraw/tbl2[variable == "Annualized Return", BB2 ]
 
 parttoadd <- data.table(
   variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
@@ -1272,6 +1276,8 @@ nms <- row.names(tbl1)
 tbl1 <- as.data.table(tbl1)
 tbl1[, variable := nms]
 
+tbl1[variable != "Annualized Sharpe (Rf=0%)", TR1 := TR1 * 100]
+
 TR1returns[, month := month(date)]
 TR1returns[, year := year(date)]
 TR1returns[, md := min(date), by = .(year, month)]
@@ -1280,15 +1286,15 @@ monthlydata <- CalculateReturns(TR1returns[date == md,.(date, normalised)])
 monthlydata <- as.data.table(monthlydata)
 monthlydata[, sign := sign(normalised)]
 
-avgneg <- monthlydata[sign == -1, mean(normalised)]
-avgpos <- monthlydata[sign == 1, mean(normalised)]
+avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
+avgpos <- monthlydata[sign == 1, mean(normalised * 100)]
 
 noneg <- nrow(monthlydata[sign == -1])
 nopos <- nrow(monthlydata[sign == 1])
 
 
-maxdraw <- maxDrawdown(as.xts(BB1returns[, .(date, return)]))[1]
-ret.maxdraw <- maxdraw/tbl1[variable == "Annualized Return", TR1]
+maxdraw <- maxDrawdown(as.xts(BB1returns[, .(date, return)]))[1] * 100
+ret.maxdraw <- maxdraw/tbl1[variable == "Annualized Return", TR1 ]
 
 parttoadd <- data.table(
   variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
@@ -1391,12 +1397,28 @@ portfolio <- returns[ , .(date, return = portfolio)]
 
 portfolio <- portfolio[!is.na(return)]
 
-portfolio[, cumret := cumsum(return)]
+
+##... FEES ...##
+
+portfolio[, year := year(date)]
+portfolio[, month := month(date)]
+
+portfolio[, md := max(date), by = .(year, month)]
+
+portfolio[, management := 0]
+portfolio[date == md, management := 0.02/12]
+
+portfolio[, totalreturn := return - management]
+
+##...      ...##
 
 
-portfolio[, normalised := cumprod(1 + return)]
+portfolio[, cumret := cumsum(totalreturn)]
+portfolio[, normalised := cumprod(1 + totalreturn)]
 startval <- portfolio[1, normalised]
 portfolio[, normalised := normalised/startval]
+
+
 
 portfolio[, prevnorm := guyrot(normalised, 252)]
 portfolio[1:252, prevnorm := NA]
@@ -1447,7 +1469,7 @@ portfoliolive <- portfoliolive[,.(date, PnL = PSQCF)]
 
 ```{r}
 
-plotdata <- rbind(portfolio[date < portfoliolive[, min(date)],.(date, return, type = "Backtest")], portfoliolive[,.(date, return = PnL, type = "Live")])
+plotdata <- rbind(portfolio[date < portfoliolive[, min(date)],.(date, return = totalreturn, type = "Backtest")], portfoliolive[,.(date, return = PnL, type = "Live")])
 plotdata[!is.na(return), cumret := cumsum(return)]
 
 pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
@@ -1492,10 +1514,26 @@ ggplotly(pic, tooltip = c("text")) %>%
 
 portfolioReturns <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
 
+##... FEES ...##
+
+portfolioReturns[, year := year(date)]
+portfolioReturns[, month := month(date)]
+
+portfolioReturns[, md := max(date), by = .(year, month)]
+
+portfolioReturns[, management := 0]
+portfolioReturns[date == md, management := 0.02/12]
+
+portfolioReturns[, totalreturn := PSQCF - management]
+
+portfolioReturns[, normalized := cumsum(totalreturn) * 100]
+
+##...      ...##
+
 portfolioReturns <- portfolioReturns[, .(date, PSQCF = normalized, `S&P` = SnPnormalised)]
 portfolioReturns <- melt(portfolioReturns, id.vars=c("date"))
 
-rebaldates <- as.Date(c("2018-07-03", "2018-08-02", "2018-09-05", "2018-10-02", "2018-11-02", "2018-12-02"))
+#rebaldates <- as.Date(c("2018-07-03", "2018-08-02", "2018-09-05", "2018-10-02", "2018-11-02", "2018-12-02"))
 
 ggplot(portfolioReturns, aes(x=date, y=value)) +
   geom_line(aes(color = variable), size = 1.2) +
@@ -1506,8 +1544,8 @@ ggplot(portfolioReturns, aes(x=date, y=value)) +
   #geom_text(data = portfolioReturns[date == max(date) | date %in% rebaldates], aes(label = round(normalized, 2)), nudge_y = 0.05) +
   ggtitle("Polar Star Quantitative Commodity Portfolio") +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  geom_vline(xintercept = as.Date(rebaldates), linetype = "dashed") +
-  annotate(geom = "text", label = "Rebalance", x=as.Date(rebaldates), y=1.6, angle= 90)  +
+  #geom_vline(xintercept = as.Date(rebaldates), linetype = "dashed") +
+  #annotate(geom = "text", label = "Rebalance", x=as.Date(rebaldates), y=1.6, angle= 90)  +
   scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255))) +
   theme(
     plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
@@ -1606,8 +1644,8 @@ monthlydata <- CalculateReturns(tbldata[date == md,.(date, cumret)])
 monthlydata <- as.data.table(monthlydata)
 monthlydata[, sign := sign(cumret)]
 
-avgneg <- monthlydata[sign == -1, mean(cumret)]
-avgpos <- monthlydata[sign == 1, mean(cumret)]
+avgneg <- monthlydata[sign == -1, mean(cumret) * 100]
+avgpos <- monthlydata[sign == 1, mean(cumret) * 100]
 
 noneg <- nrow(monthlydata[sign == -1])
 nopos <- nrow(monthlydata[sign == 1])
@@ -1618,7 +1656,9 @@ nms <- row.names(tbl1)
 tbl1 <- as.data.table(tbl1)
 tbl1[, variable := nms]
 
-maxdraw <- maxDrawdown(as.xts(tbldata[, .(date, return)]))[1]
+tbl1[variable != "Annualized Sharpe (Rf=0%)", `1998-` := `1998-` * 100]
+
+maxdraw <- maxDrawdown(as.xts(tbldata[, .(date, return)]))[1] * 100
 ret.maxdraw <- maxdraw/tbl1[variable == "Annualized Return", `1998-`]
 
 parttoadd <- data.table(
@@ -1640,11 +1680,13 @@ nms <- row.names(tbl2)
 tbl2 <- as.data.table(tbl2)
 tbl2[, variable := nms]
 
-maxdraw <- maxDrawdown(as.xts(tbldata[date >= "2008-01-01", .(date, return)]))[1]
+tbl2[variable != "Annualized Sharpe (Rf=0%)", `2008-` := `2008-` * 100]
+
+maxdraw <- maxDrawdown(as.xts(tbldata[date >= "2008-01-01", .(date, return)]))[1] * 100
 ret.maxdraw <- maxdraw/tbl2[variable == "Annualized Return", `2008-`]
 
-avgneg <- monthlydata[sign == -1 & index >= "2008-01-01", mean(cumret)]
-avgpos <- monthlydata[sign == 1 & index >= "2008-01-01", mean(cumret)]
+avgneg <- monthlydata[sign == -1 & index >= "2008-01-01", mean(cumret) * 100]
+avgpos <- monthlydata[sign == 1 & index >= "2008-01-01", mean(cumret) * 100]
 
 noneg <- nrow(monthlydata[sign == -1 & index >= "2008-01-01"])
 nopos <- nrow(monthlydata[sign == 1 & index >= "2008-01-01"])
@@ -1671,11 +1713,13 @@ nms <- row.names(tbl3)
 tbl3 <- as.data.table(tbl3)
 tbl3[, variable := nms]
 
-maxdraw <- maxDrawdown(as.xts(tbldata[date >= "2015-01-01", .(date, return)]))[1]
+tbl3[variable != "Annualized Sharpe (Rf=0%)", `2015-` := `2015-` * 100]
+
+maxdraw <- maxDrawdown(as.xts(tbldata[date >= "2015-01-01", .(date, return)]))[1] * 100
 ret.maxdraw <- maxdraw/tbl3[variable == "Annualized Return", `2015-`]
 
-avgneg <- monthlydata[sign == -1 & index >= "2015-01-01", mean(cumret)]
-avgpos <- monthlydata[sign == 1 & index >= "2015-01-01", mean(cumret)]
+avgneg <- monthlydata[sign == -1 & index >= "2015-01-01", mean(cumret) * 100]
+avgpos <- monthlydata[sign == 1 & index >= "2015-01-01", mean(cumret) * 100]
 
 noneg <- nrow(monthlydata[sign == -1 & index >= "2015-01-01"])
 nopos <- nrow(monthlydata[sign == 1 & index >= "2015-01-01"])
@@ -1703,6 +1747,168 @@ tbl <- merge(tbl, tbl3, by = "Statistic")
 formattable(tbl)
 
 ```
+
+
+# Quantitative Portfolio as supplement to S&P500 {data-background="img/background_mtns_1.png"}
+
+## {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+snp <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/spx.csv"))
+
+snp <- snp[date >= portfolio[, min(date)]]
+snp[, SnP := SnP/snp[1, SnP]]
+setnames(snp, "SnP", "S&P500")
+
+quant <- portfolio[, .(date, PSQCF = normalised)]
+
+together <- merge(quant, snp, by = "date")
+
+```
+
+
+
+
+```{r}
+
+together[, month := month(date)]
+together[, year := year(date)]
+together[, md := max(date), by = .(year, month)]
+together <- together[date == md]
+together <- together[, .(date, PSQCF, `S&P500`)]
+
+returns <- CalculateReturns(together)
+
+portion <- seq(0, 1, 0.01)
+
+part <- vector(mode = "list", length = length(portion))
+for(i in 1:length(portion)){
+  #i=1
+  tempret <- Return.portfolio(returns, weights = c(portion[i], 1-portion[i]))
+  tempret <- as.data.table(tempret)
+  tempret[, PS_ratio := portion[i]]
+  part[[i]] <- tempret  
+}
+
+allparts <- rbindlist(part)
+allparts[, label := paste("Polar Star", PS_ratio * 100)]
+
+widedata <- dcast(allparts, index ~ label, value.var = "portfolio.returns")
+widedata <- as.xts(widedata)
+
+
+cols <- paste("Polar Star", seq(0, 100, 10))
+
+draws <- maxDrawdown(widedata)
+stdevs <- StdDev(widedata)
+
+annData <- table.AnnualizedReturns(widedata, scale = 12, digits = 8)
+annData <- as.data.table(annData[1,])
+annData <- rbind(annData, stdevs, draws)
+annData[, variable := c("Annualised Return", "Standard Deviation", "Worst Drawdown")]
+
+
+plotdata <- melt(annData, id.vars = "variable", variable.name = "PSFraction")
+plotdata <- dcast(plotdata, PSFraction ~ variable, value.var = "value")
+setnames(plotdata, names(plotdata), gsub(" ", "_", names(plotdata)))
+plotdata[, Annualised_Return := Annualised_Return * 100]
+plotdata[, Standard_Deviation := Standard_Deviation * 100]
+plotdata[, Worst_Drawdown := Worst_Drawdown * 100]
+plotdata[, marker := tstrsplit(PSFraction ,"Star", keep = 2)]
+plotdata[, marker := as.integer(marker)]
+plotdata <- plotdata[order(marker)]
+plotdata[, group := ifelse(marker %% 10 == 0, "A", "B")]
+plotdata[, PSFraction := paste0(PSFraction, "%")]
+
+plotdata[, PSFraction := gsub("Polar Star", "PSQCF", PSFraction)]
+
+```
+
+
+
+```{r}
+
+ggplot(plotdata, aes(x=Standard_Deviation, y=Annualised_Return)) +
+  geom_point(aes(color = group, size = group)) +
+  geom_text(data = plotdata[group == "A"], 
+            aes(label = PSFraction), nudge_x = 0.15, size = 4.5, colour = rgb(5,61,96, maxColorValue = 255) ) +
+  ylab("Annualised Return") +
+  xlab("Standard Deviation") +
+  ggtitle("Polar Star Quantitiave Commodity Fund and S&P500 Efficeint Frontier") +
+  scale_size_manual(values = c(5, 1), guide=FALSE) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), "gray"), guide=FALSE) +
+  scale_x_continuous(breaks = pretty_breaks(n = 10), expand = c(.1, 0)) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 12, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+
+
+```
+
+
+## Portfolio Comparison {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+allPortfolios <- together[, .(date, `S&P500`, PSQCF, `PSQCF and S&P500` = 0.2 * PSQCF + 0.8 * `S&P500`)]
+
+
+monthlydata <- CalculateReturns(allPortfolios)
+monthlydata <- as.data.table(monthlydata)
+
+monthlydata <- melt(monthlydata, id.vars = "index", variable.name = "Portfolio", value.name = "Return")
+monthlydata <- monthlydata[!is.na(Return)]
+monthlydata[, sign := sign(Return)]
+
+avgrets <- monthlydata[, .(avgret = mean(Return) * 100, .N), by = .(Portfolio, sign)]
+
+numbers <- dcast(avgrets, sign ~ Portfolio, value.var = "N")
+numbers[, variable := ifelse(sign == -1, "Number of Negative Months", "Number of Positive Months")]
+numbers[, sign := NULL]
+
+posnegrets <- dcast(avgrets, sign ~ Portfolio, value.var = "avgret")
+posnegrets[, variable := ifelse(sign == -1, "Avereage Negative Month Return", "Average Positive Month Return")]
+posnegrets[, sign := NULL]
+
+tbl1 <- table.AnnualizedReturns(as.xts(CalculateReturns(allPortfolios)))
+maxdraw <- maxDrawdown(as.xts(CalculateReturns(allPortfolios))) 
+
+
+tbl1 <- rbind(tbl1, maxdraw)
+nms <- row.names(tbl1)
+tbl1 <- as.data.table(tbl1)
+tbl1[, variable := nms]
+
+tbl1[variable != "Annualized Sharpe (Rf=0%)", `PSQCF and S&P500` := `PSQCF and S&P500` * 100]
+tbl1[variable != "Annualized Sharpe (Rf=0%)", `S&P500` := `S&P500` * 100]
+tbl1[variable != "Annualized Sharpe (Rf=0%)", PSQCF := PSQCF * 100]
+
+
+tbl <- rbind(tbl1, numbers, posnegrets)
+setnames(tbl, "variable", "Statistic")
+
+tempdata <- melt(tbl, id.vars = "Statistic", variable.name = "Portfolio")
+tempdata[, value := round(value, 3)]
+
+tbl <- dcast(tempdata, Statistic ~ Portfolio, value.var = "value")
+tbl <- tbl[, .(Statistic, `S&P500`, PSQCF, `PSQCF and S&P500`)]
+
+
+formattable(tbl)
+
+```
+
 
 
 # Polar Star Multi Strategy Portfolio {data-background="img/background_mtns_1.png"}
@@ -1950,7 +2156,7 @@ monthlydata <- as.data.table(monthlydata)
 monthlydata <- melt(monthlydata, id.vars = "index", variable.name = "Portfolio", value.name = "Return")
 monthlydata[, sign := sign(Return)]
 
-avgrets <- monthlydata[, .(avgret = mean(Return), .N), by = .(Portfolio, sign)]
+avgrets <- monthlydata[, .(avgret = mean(Return) * 100, .N), by = .(Portfolio, sign)]
 
 numbers <- dcast(avgrets, sign ~ Portfolio, value.var = "N")
 numbers[, variable := ifelse(sign == -1, "Number of Negative Months", "Number of Positive Months")]
@@ -1967,6 +2173,13 @@ tbl1 <- rbind(tbl1, maxdraw)
 nms <- row.names(tbl1)
 tbl1 <- as.data.table(tbl1)
 tbl1[, variable := nms]
+
+tbl1[variable != "Annualized Sharpe (Rf=0%)", PSLtd := PSLtd * 100]
+tbl1[variable != "Annualized Sharpe (Rf=0%)", `S&P500` := `S&P500` * 100]
+tbl1[variable != "Annualized Sharpe (Rf=0%)", PSQCF := PSQCF * 100]
+tbl1[variable != "Annualized Sharpe (Rf=0%)", `PS Multi Strategy` := `PS Multi Strategy` * 100]
+tbl1[variable != "Annualized Sharpe (Rf=0%)", `PS Multi Strategy and S&P500`:= `PS Multi Strategy and S&P500` * 100]
+
 
 tbl <- rbind(tbl1, numbers, posnegrets)
 setnames(tbl, "variable", "Statistic")
