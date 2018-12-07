@@ -1406,9 +1406,37 @@ portfolio[, month := month(date)]
 portfolio[, md := max(date), by = .(year, month)]
 
 portfolio[, management := 0]
+
+portfolio[, half := ifelse(month < 7, 1, 2)]
+
+
 portfolio[date == md, management := 0.02/12]
 
 portfolio[, totalreturn := return - management]
+
+
+s.data <- split(portfolio, list(portfolio$year, portfolio$half))
+tflist <- map_lgl(s.data, function(df){ifelse(nrow(df) < 1, F, T)})
+s.data <- s.data[tflist]
+
+getPerformance <- function(df, hurdle = 1.02){
+  #df = s.data[[1]]
+  ret <- df[, prod(1 + totalreturn)]
+  diff <- ret - hurdle
+  perf <- ifelse(diff > 0, diff, 0) * 0.2
+  
+  output <- data.table(
+    date = df[, max(date)],
+    performance = perf
+  )
+}
+
+performancefees <- rbindlist(lapply(s.data, getPerformance))
+
+portfolio <- merge(portfolio, performancefees, by = "date", all = TRUE)
+portfolio[, performance := ifelse(is.na(performance), 0, performance)]
+
+portfolio[, totalreturn := totalreturn - performance]
 
 ##...      ...##
 
@@ -1633,7 +1661,7 @@ ggplot(portfolio, aes(x=`rolling Sharpe`)) +
 
 ```{r}
 
-tbldata <- rbind(portfolio[,.(date, return)], portfoliolive[, .(date, return = PnL)])
+tbldata <- rbind(portfolio[,.(date, return = totalreturn)], portfoliolive[, .(date, return = PnL)])
 tbldata[, month := month(date)]
 tbldata[, year := year(date)]
 tbldata[, cumret := cumprod(return + 1)]
@@ -1920,6 +1948,15 @@ formattable(tbl)
 together <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/together.csv"))
 together <- together[order(date)]
 
+fees <- portfolio[date == md, .(year, month, fees = management + performance)]
+
+together[, year := year(date)]
+together[, month := month(date)]
+together <- merge(together, fees, by = c("year", "month"))
+together[, PSQCF := PSQCF - fees]
+together[ , c("year", "month", "fees") := NULL ]
+
+
 together[, PSLtd := cumprod(1+PSLtd)]
 together[, PSQCF := cumprod(1+PSQCF)]
 together[, SnP := cumprod(1+SnP)]
@@ -1972,6 +2009,14 @@ ggplotly(pic) %>%
 ```{r}
 
 together <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/together.csv"))
+
+fees <- portfolio[date == md, .(year, month, fees = management + performance)]
+
+together[, year := year(date)]
+together[, month := month(date)]
+together <- merge(together, fees, by = c("year", "month"))
+together[, PSQCF := PSQCF - fees]
+together[ , c("year", "month", "fees") := NULL ]
 
 
 returns <- as.xts(together[,.(date, PSLtd, PSQCF)])
@@ -2059,10 +2104,10 @@ ggplot(plotdata, aes(x=Standard_Deviation, y=Annualised_Return)) +
 
 ```{r}
 
-allPortfolios <- together[, .(date, `50-50` = PSLtd * 0.5 + PSQCF * 0.5, SnP, PSLtd, PSQCF)]
+allPortfolios <- together[, .(date, `40-60` = PSLtd * 0.6 + PSQCF * 0.4, SnP, PSLtd, PSQCF)]
 
 
-returns <- as.xts(allPortfolios[,.(date, `50-50`, SnP)])
+returns <- as.xts(allPortfolios[,.(date, `40-60`, SnP)])
 
 portion <- seq(0, 1, 0.01)
 
@@ -2147,8 +2192,8 @@ ggplot(plotdata, aes(x=Standard_Deviation, y=Annualised_Return)) +
 
 ```{r}
 
-allPortfolios[, `PS Multi Strategy and S&P500` := `50-50` * 0.5 + SnP * 0.5]
-setnames(allPortfolios, c("50-50", "SnP"), c("PS Multi Strategy","S&P500"))
+allPortfolios[, `PS Multi Strategy and S&P500` := `40-60` * 0.5 + SnP * 0.5]
+setnames(allPortfolios, c("40-60", "SnP"), c("PS Multi Strategy","S&P500"))
 
 
 monthlydata <- as.xts(allPortfolios)
