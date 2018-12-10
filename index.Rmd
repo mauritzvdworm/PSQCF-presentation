@@ -1057,6 +1057,50 @@ setnames(tbl1, "variable", "Statistic")
 
 ##
 
+tbl1live <- table.AnnualizedReturns(BB1live[, .(date, `BB1 live` = PnL)])
+nms <- row.names(tbl1live)
+tbl1live <- as.data.table(tbl1live)
+tbl1live[, variable := nms]
+
+BB1live[, month := month(date)]
+BB1live[, year := year(date)]
+BB1live[, md := min(date), by = .(year, month)]
+
+BB1live[is.na(PnL), PnL := 0]
+BB1live[, normalised := cumprod(PnL + 1)]
+
+monthlydata <- CalculateReturns(BB1live[date == md,.(date, normalised)])
+monthlydata <- as.data.table(monthlydata)
+monthlydata[, sign := sign(normalised)]
+
+avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
+avgpos <- monthlydata[sign == 1, mean(normalised) * 100]
+
+noneg <- nrow(monthlydata[sign == -1])
+nopos <- nrow(monthlydata[sign == 1])
+
+
+maxdraw <- maxDrawdown(as.xts(BB1live[, .(date, PnL)]))[1] * 100
+ret.maxdraw <- maxdraw/tbl1live[variable == "Annualized Return", `BB1 live` * 100]
+
+parttoadd <- data.table(
+  variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
+  `BB1 live` = c(maxdraw, ret.maxdraw, nopos, noneg, avgpos, avgneg)
+)
+
+
+tbl1live[variable != "Annualized Sharpe (Rf=0%)", `BB1 live` := `BB1 live` * 100]
+
+tbl1live <- rbind(tbl1live, parttoadd)
+tbl1live <- tbl1live[,.(variable, `BB1 live`)]
+tbl1live[, `BB1 live` := round(`BB1 live`, 3)]
+
+setnames(tbl1live, "variable", "Statistic")
+
+
+##
+
+
 tbl2 <- table.AnnualizedReturns(BB2returns[, .(date, BB2 = return)])
 nms <- row.names(tbl2)
 tbl2 <- as.data.table(tbl2)
@@ -1095,8 +1139,54 @@ tbl2[, BB2 := round(BB2, 3)]
 setnames(tbl2, "variable", "Statistic")
 
 
-tbl <- merge(tbl1, tbl2, by = "Statistic")
+##
 
+tbl2live <- table.AnnualizedReturns(BB2live[, .(date, `BB2 live` = PnL)])
+nms <- row.names(tbl2live)
+tbl2live <- as.data.table(tbl2live)
+tbl2live[, variable := nms]
+
+BB2live[, month := month(date)]
+BB2live[, year := year(date)]
+BB2live[, md := min(date), by = .(year, month)]
+
+BB2live[is.na(PnL), PnL := 0]
+BB2live[, normalised := cumprod(PnL + 1)]
+
+monthlydata <- CalculateReturns(BB2live[date == md,.(date, normalised)])
+monthlydata <- as.data.table(monthlydata)
+monthlydata[, sign := sign(normalised)]
+
+avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
+avgpos <- monthlydata[sign == 1, mean(normalised) * 100]
+
+noneg <- nrow(monthlydata[sign == -1])
+nopos <- nrow(monthlydata[sign == 1])
+
+
+maxdraw <- maxDrawdown(as.xts(BB2live[, .(date, PnL)]))[1] * 100
+ret.maxdraw <- maxdraw/tbl2live[variable == "Annualized Return", `BB2 live` * 100]
+
+parttoadd <- data.table(
+  variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
+  `BB2 live` = c(maxdraw, ret.maxdraw, nopos, noneg, avgpos, avgneg)
+)
+
+
+tbl2live[variable != "Annualized Sharpe (Rf=0%)", `BB2 live` := `BB2 live` * 100]
+
+tbl2live <- rbind(tbl2live, parttoadd)
+tbl2live <- tbl2live[,.(variable, `BB2 live`)]
+tbl2live[, `BB2 live` := round(`BB2 live`, 3)]
+
+setnames(tbl2live, "variable", "Statistic")
+
+
+##
+
+tblA <- merge(tbl1, tbl1live, by = "Statistic")
+tblB <- merge(tbl2, tbl2live, by = "Statistic")
+tbl <- merge(tblA, tblB, by = "Statistic")
 
 formattable(tbl)
 
@@ -1306,9 +1396,55 @@ tbl1 <- rbind(tbl1, parttoadd)
 tbl1 <- tbl1[,.(variable, TR1)]
 tbl1[, TR1 := round(TR1, 3)]
 
-setnames(tbl1, "variable", "Statistic")
+##
 
-formattable(tbl1)
+tbl1live <- table.AnnualizedReturns(TR1live[, .(date, `TR1 live` = PnL)])
+nms <- row.names(tbl1live)
+tbl1live <- as.data.table(tbl1live)
+tbl1live[, variable := nms]
+
+TR1live[, month := month(date)]
+TR1live[, year := year(date)]
+TR1live[, md := min(date), by = .(year, month)]
+
+TR1live[is.na(PnL), PnL := 0]
+TR1live[, normalised := cumprod(PnL + 1)]
+
+monthlydata <- CalculateReturns(TR1live[date == md,.(date, normalised)])
+monthlydata <- as.data.table(monthlydata)
+monthlydata[, sign := sign(normalised)]
+
+avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
+avgpos <- monthlydata[sign == 1, mean(normalised) * 100]
+
+noneg <- nrow(monthlydata[sign == -1])
+nopos <- nrow(monthlydata[sign == 1])
+
+
+maxdraw <- maxDrawdown(as.xts(TR1live[, .(date, PnL)]))[1] * 100
+ret.maxdraw <- maxdraw/tbl1live[variable == "Annualized Return", `TR1 live` * 100]
+
+parttoadd <- data.table(
+  variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
+  `TR1 live` = c(maxdraw, ret.maxdraw, nopos, noneg, avgpos, avgneg)
+)
+
+
+tbl1live[variable != "Annualized Sharpe (Rf=0%)", `TR1 live` := `TR1 live` * 100]
+
+tbl1live <- rbind(tbl1live, parttoadd)
+tbl1live <- tbl1live[,.(variable, `TR1 live`)]
+tbl1live[, `TR1 live` := round(`TR1 live`, 3)]
+
+setnames(tbl1live, "variable", "Statistic")
+
+
+##
+
+tbl <- cbind(tbl1, tbl1live[, .(`TR1 live`)])
+
+
+formattable(tbl)
 
 ```
 
@@ -1419,11 +1555,11 @@ s.data <- split(portfolio, list(portfolio$year, portfolio$half))
 tflist <- map_lgl(s.data, function(df){ifelse(nrow(df) < 1, F, T)})
 s.data <- s.data[tflist]
 
-getPerformance <- function(df, hurdle = 1.02){
+getPerformance <- function(df, hurdle = 1.025){
   #df = s.data[[1]]
   ret <- df[, prod(1 + totalreturn)]
   diff <- ret - hurdle
-  perf <- ifelse(diff > 0, diff, 0) * 0.2
+  perf <- ifelse(diff > 0, ret - 1.02, 0) * 0.2
   
   output <- data.table(
     date = df[, max(date)],
@@ -1546,6 +1682,7 @@ portfolioReturns <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star
 
 portfolioReturns[, year := year(date)]
 portfolioReturns[, month := month(date)]
+portfolioReturns[, half := ifelse(month < 7, 1, 2)]
 
 portfolioReturns[, md := max(date), by = .(year, month)]
 
@@ -1555,6 +1692,21 @@ portfolioReturns[date == md, management := 0.02/12]
 portfolioReturns[, totalreturn := PSQCF - management]
 
 portfolioReturns[, normalized := cumsum(totalreturn) * 100]
+
+
+# s.data <- split(portfolioReturns, list(portfolioReturns$year, portfolioReturns$half))
+# tflist <- map_lgl(s.data, function(df){ifelse(nrow(df) < 1, F, T)})
+# s.data <- s.data[tflist]
+# 
+# 
+# performancefees <- rbindlist(lapply(s.data, getPerformance))
+# 
+# portfolio <- merge(portfolio, performancefees, by = "date", all = TRUE)
+# portfolio[, performance := ifelse(is.na(performance), 0, performance)]
+# 
+# portfolio[, totalreturn := totalreturn - performance]
+
+
 
 ##...      ...##
 
@@ -1768,9 +1920,41 @@ setnames(tbl3, "variable", "Statistic")
 
 ##
 
+tbl4 <- table.AnnualizedReturns(tbldata[date >= "2018-06-01", .(date, live = return)])
+nms <- row.names(tbl4)
+tbl4 <- as.data.table(tbl4)
+tbl4[, variable := nms]
+
+tbl4[variable != "Annualized Sharpe (Rf=0%)", live := live * 100]
+
+maxdraw <- maxDrawdown(as.xts(tbldata[date >= "2018-06-01", .(date, return)]))[1] * 100
+ret.maxdraw <- maxdraw/tbl4[variable == "Annualized Return", live]
+
+avgneg <- monthlydata[sign == -1 & index >= "2018-06-01", mean(cumret) * 100]
+avgpos <- monthlydata[sign == 1 & index >= "2018-06-01", mean(cumret) * 100]
+
+noneg <- nrow(monthlydata[sign == -1 & index >= "2018-06-01"])
+nopos <- nrow(monthlydata[sign == 1 & index >= "2018-06-01"])
+
+
+parttoadd <- data.table(
+  variable = c("Maximum Drawdown", "Maximum Drawdown/Annualized Return", "Number of Positive Months", "Number of Negative Months", "Average Positive Month Return", "Average Negative Month Return"),
+  live = c(maxdraw, ret.maxdraw, nopos, noneg, avgpos, avgneg)
+)
+
+
+tbl4 <- rbind(tbl4, parttoadd)
+tbl4 <- tbl4[,.(variable, live)]
+tbl4[, live := round(live, 3)]
+
+setnames(tbl4, "variable", "Statistic")
+
+
+##
 
 tbl <- merge(tbl1, tbl2, by = "Statistic")
 tbl <- merge(tbl, tbl3, by = "Statistic")
+tbl <- merge(tbl, tbl4, by = "Statistic")
 
 formattable(tbl)
 
@@ -1889,7 +2073,7 @@ ggplot(plotdata, aes(x=Standard_Deviation, y=Annualised_Return)) +
 
 ```{r}
 
-allPortfolios <- together[, .(date, `S&P500`, PSQCF, `PSQCF and S&P500` = 0.2 * PSQCF + 0.8 * `S&P500`)]
+allPortfolios <- together[, .(date, `S&P500`, PSQCF, `PSQCF and S&P500` = 0.3 * PSQCF + 0.7 * `S&P500`)]
 
 
 monthlydata <- CalculateReturns(allPortfolios)
@@ -2104,10 +2288,10 @@ ggplot(plotdata, aes(x=Standard_Deviation, y=Annualised_Return)) +
 
 ```{r}
 
-allPortfolios <- together[, .(date, `40-60` = PSLtd * 0.6 + PSQCF * 0.4, SnP, PSLtd, PSQCF)]
+allPortfolios <- together[, .(date, `50-50` = PSLtd * 0.5 + PSQCF * 0.5, SnP, PSLtd, PSQCF)]
 
 
-returns <- as.xts(allPortfolios[,.(date, `40-60`, SnP)])
+returns <- as.xts(allPortfolios[,.(date, `50-50`, SnP)])
 
 portion <- seq(0, 1, 0.01)
 
@@ -2192,8 +2376,8 @@ ggplot(plotdata, aes(x=Standard_Deviation, y=Annualised_Return)) +
 
 ```{r}
 
-allPortfolios[, `PS Multi Strategy and S&P500` := `40-60` * 0.5 + SnP * 0.5]
-setnames(allPortfolios, c("40-60", "SnP"), c("PS Multi Strategy","S&P500"))
+allPortfolios[, `PS Multi Strategy and S&P500` := `50-50` * 0.5 + SnP * 0.5]
+setnames(allPortfolios, c("50-50", "SnP"), c("PS Multi Strategy","S&P500"))
 
 
 monthlydata <- as.xts(allPortfolios)
