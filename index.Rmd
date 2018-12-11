@@ -223,7 +223,7 @@ ggplotly(pic)
 </br>
 
 - Quantitative
-    - Harvest systematic risk premium from large universe of commodities
+    - Harvest systematic alpha from large universe of commodities
     - Rule based decision making process
     - Strategies inspired by discretional methodology
 
