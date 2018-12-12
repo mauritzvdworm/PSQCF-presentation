@@ -348,6 +348,89 @@ $$
     - when we trade
 
 
+## When we trade {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+tradeData <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Start Ideas/PS trend/tradeData.csv"))
+
+tradeData[, monthcut := cut(month, breaks = c(0,3,6,9,12,15,18,21,24))]
+
+```
+
+
+```{r}
+
+plotdata <- tradeData[fund != "Spectrum", .N, by = .(fund, monthcut)]
+plotdata[, total := sum(N), by = fund]
+plotdata[, percentage := N/total * 100]
+plotdata[, monthnumber := as.integer(monthcut) * 3]
+
+ggplot(plotdata, aes(x=factor(monthnumber), y=percentage)) +
+  geom_bar(stat = "identity", fill = rgb(5,61,96, maxColorValue = 255)) + 
+  xlab("Month Ranges") +
+  ylab("Percentage of Trades") +
+  geom_text(aes(label = round(percentage,1)), nudge_y = 1, colour = rgb(5,61,96, maxColorValue = 255)) +
+  facet_wrap(~fund) +
+  ggtitle("Percentage of trades with months until expiry") +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=12),
+    text=element_text(family="Century Gothic"),
+    strip.text.x = element_text(size = 14, colour = rgb(5,61,96, maxColorValue = 255))
+  )
+
+
+```
+
+
+## What we trade {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+tradeData[, comdty := tstrsplit(contractID, "_", keep = 1)]
+tradeData[, month := month(`Trade Date`)]
+tradeData[, year := year(`Trade Date`)]
+
+plotdata <- tradeData[fund != "Spectrum", .(comdty, fund, year, month)]
+setkey(plotdata, NULL)
+plotdata <- unique(plotdata)
+
+
+plotdata <- plotdata[, .N, by = .(fund, year, month)]
+plotdata[, date := paste(year, month, 1, sep = "-")]
+plotdata[, date := as.Date(date)]
+
+ggplot(plotdata[date >= "2018-07-01"], aes(x=date, y= N)) +
+  geom_bar(stat = "identity", fill = rgb(5,61,96, maxColorValue = 255)) +
+  facet_wrap(~fund) +
+  scale_y_continuous(breaks = pretty_breaks(n = 10)) +
+  geom_text(aes(label = N), nudge_y = 1) + 
+  ggtitle("Number of unique commodities traded in each fund since July") +
+  ylab("Number of unique commodities") +
+  xlab("Month") +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=12),
+    text=element_text(family="Century Gothic"),
+    strip.text.x = element_text(size = 14, colour = rgb(5,61,96, maxColorValue = 255))
+  )
+
+
+
+```
 
 
 ## Literature {data-background="img/BlueBackgroundWithOrange.png"}
