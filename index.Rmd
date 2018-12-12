@@ -1306,6 +1306,100 @@ Literature on applying machine learing techniques in algorithmic trading:
 - 35 Commodities and 2 tenors
 
 
+## Designing, not fitting a strategy {data-background="img/BlueBackgroundWithOrange.png"}
+
+Aim of a trend following strategy
+
+- Profitably trade trending markets
+- Accross a diverse universe of commodities
+
+</br>
+
+>If we feed our trend system fake trendy data
+>
+>- linear and sinusoidal, with 
+>- Gaussian noise
+> 
+> 
+>can we trade it profitably?
+
+
+## Fake Trendy Data {data-background="img/BlueBackgroundWithOrange.png"}
+
+
+```{r}
+
+allPrices <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Start Ideas/PS trend/designing strategies/allPrices.csv"))
+setnames(allPrices, names(allPrices), c("date", "price", "comdty"))
+
+allPrices[, ref := substring(comdty, 3, 3)]
+allPrices[, comdty := substring(comdty, 1, 2)]
+
+
+```
+
+
+```{r}
+
+ggplot(allPrices[date >= "2003-01-01" & ref > 3], aes(x=date, y=price)) +
+  geom_line() +
+  facet_grid(ref ~ comdty) +
+  ggtitle("Time evolution of the fake data") +
+  xlab("") +
+  ylab("Price") +
+  scale_y_continuous(breaks = pretty_breaks(n = 8)) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+
+```
+
+## Trend - Fake Data Performance {data-background="img/BlueBackgroundWithOrange.png"}
+
+```{r}
+
+returns_instrument_forecast_divmult_scale_weight_estimates <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Start Ideas/PS trend/designing strategies/returns_instrument_forecast_divmult_scale_weight_estimates.csv"))
+setnames(returns_instrument_forecast_divmult_scale_weight_estimates, names(returns_instrument_forecast_divmult_scale_weight_estimates), c("date", "return"))
+
+returns_instrument_forecast_divmult_scale_weight_estimates <- returns_instrument_forecast_divmult_scale_weight_estimates[date >= "2002-12-31"]
+returns_instrument_forecast_divmult_scale_weight_estimates[, return := return/100]
+returns_instrument_forecast_divmult_scale_weight_estimates[, cumret := cumsum(return)]
+
+```
+
+```{r}
+
+ggplot(returns_instrument_forecast_divmult_scale_weight_estimates, aes(x=date, y=cumret)) +
+  geom_line(colour = rgb(5,61,96, maxColorValue = 255)) +
+  ggtitle("Cummulative performance on fake trendy data") +
+  xlab("") +
+  ylab("P&L") +
+  scale_y_continuous(breaks = pretty_breaks(n = 8)) +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic")
+  )
+
+
+
+```
+
 ## Trend - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
 
 ```{r}
@@ -2513,15 +2607,16 @@ formattable(tbl)
 
 ## {data-background="img/BlueBackgroundWithOrange.png"}
 
-Combining a 
-
-* discretionary and 
-* systematic approach 
-
-to investing in commodities we create a product with
-
-* positive expected return which is
-* uncorrelated to equities
-
-that gives superior risk adjusted returns.
+>Combining a 
+> 
+> 
+>* discretionary and 
+>* systematic approach 
+> 
+>to investing in commodities we create a product with
+> 
+>* positive expected return which is
+>* uncorrelated to equities
+> 
+>that gives superior risk adjusted returns.
 
