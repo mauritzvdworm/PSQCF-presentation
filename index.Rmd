@@ -2609,9 +2609,8 @@ formattable(tbl)
 
 ## {data-background="img/BlueBackgroundWithOrange.png"}
 
->Combining a 
-> 
-> 
+>Combining a </br>
+>
 >* discretionary and 
 >* systematic approach 
 > 
