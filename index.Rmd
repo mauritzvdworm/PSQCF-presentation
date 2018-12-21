@@ -1813,6 +1813,8 @@ portfoliolive <- portfoliolive[,.(date, PnL = PSQCF)]
 plotdata <- rbind(portfolio[date < portfoliolive[, min(date)],.(date, return = totalreturn, type = "Backtest")], portfoliolive[,.(date, return = PnL, type = "Live")])
 plotdata[!is.na(return), cumret := cumsum(return)]
 
+#write.csv(plotdata, "PSQCFreturns.csv", row.names = FALSE)
+
 pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
                             text = paste('Cummulative Return: ', round(cumret,2),
                                          '<br>Date: ', as.Date(date))
