@@ -1315,13 +1315,12 @@ Aim of a trend following strategy
 
 </br>
 
->If we feed our trend system fake trendy data
->
->- linear and sinusoidal, with 
->- Gaussian noise
-> 
-> 
->can we trade it profitably?
+If we feed our trend system fake trendy data
+
+- linear and sinusoidal, with 
+- Gaussian noise
+ 
+can we trade it profitably?
 
 
 ## Fake Trendy Data {data-background="img/BlueBackgroundWithOrange.png"}
@@ -1636,6 +1635,9 @@ formattable(tbl)
 - <a href = "https://www.amazon.com/Trend-Following-Managed-Futures-Trading/dp/1118890973" target="_blank">Trend Following with Managed Futures - Greyserman and Kaminski</a>
 
 
+In-house Research:
+
+- <a href = "https://clever-stonebraker-da1d54.netlify.com/post/designing-a-trend-strategy/" target="_blank">Designing a trend strategy</a>
 
 
 
@@ -2609,15 +2611,16 @@ formattable(tbl)
 
 ## {data-background="img/BlueBackgroundWithOrange.png"}
 
->Combining a </br>
->
->* discretionary and 
->* systematic approach 
-> 
->to investing in commodities we create a product with
-> 
->* positive expected return which is
->* uncorrelated to equities
-> 
->that gives superior risk adjusted returns.
+
+Combining a 
+
+* discretionary and 
+* systematic approach 
+ 
+to investing in commodities we create a product with
+ 
+* positive expected return which is
+* uncorrelated to equities
+ 
+that gives superior risk adjusted returns.
 
