@@ -1804,7 +1804,7 @@ portfolio[, `rolling Sharpe` := `rolling return`/`rolling risk`]
 
 
 portfoliolive <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
-portfoliolive <- portfoliolive[,.(date, PnL = PSQCF)]
+portfoliolive <- portfoliolive[flag != "Backtest" ,.(date, PnL = return, type = flag)]
 
 ```
 
@@ -1812,7 +1812,7 @@ portfoliolive <- portfoliolive[,.(date, PnL = PSQCF)]
 
 ```{r}
 
-plotdata <- rbind(portfolio[date < portfoliolive[, min(date)],.(date, return = totalreturn, type = "Backtest")], portfoliolive[,.(date, return = PnL, type = "Live")])
+plotdata <- rbind(portfolio[date < portfoliolive[, min(date)],.(date, return = totalreturn, type = "Backtest")], portfoliolive[,.(date, return = PnL, type)])
 plotdata[!is.na(return), cumret := cumsum(return)]
 
 #write.csv(plotdata, "PSQCFreturns.csv", row.names = FALSE)
@@ -1828,7 +1828,7 @@ pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
   ggtitle("Polar Star Quantitative Commodity Fund Equity Curve") +
   scale_x_date(breaks = pretty_breaks(n = 10)) +
   scale_y_continuous(breaks = pretty_breaks(n = 10)) +
-  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255))) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255), "darkgreen")) +
   theme(
     plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
     panel.background = element_rect(fill = "white"),
@@ -1859,6 +1859,11 @@ ggplotly(pic, tooltip = c("text")) %>%
 
 portfolioReturns <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
 
+portfolioReturns <- portfolioReturns[flag != "Backtest"]
+
+portfolioReturns[, SnPnormalised := (SnPnormalised/portfolioReturns[1, SnPnormalised] - 1) * 100]
+portfolioReturns[, SnPnormalised := na.locf(SnPnormalised)]
+
 ##... FEES ...##
 
 portfolioReturns[, year := year(date)]
@@ -1870,7 +1875,7 @@ portfolioReturns[, md := max(date), by = .(year, month)]
 portfolioReturns[, management := 0]
 portfolioReturns[date == md, management := 0.02/12]
 
-portfolioReturns[, totalreturn := PSQCF - management]
+portfolioReturns[, totalreturn := return - management]
 
 portfolioReturns[, normalized := cumsum(totalreturn) * 100]
 
@@ -1891,13 +1896,14 @@ portfolioReturns[, normalized := cumsum(totalreturn) * 100]
 
 ##...      ...##
 
-portfolioReturns <- portfolioReturns[, .(date, PSQCF = normalized, `S&P` = SnPnormalised)]
-portfolioReturns <- melt(portfolioReturns, id.vars=c("date"))
+portfolioReturns <- portfolioReturns[, .(date, PSQCF = normalized, `S&P` = SnPnormalised, flag)]
+portfolioReturns <- melt(portfolioReturns, id.vars=c("date", "flag"))
+portfolioReturns[, flag := ifelse(variable == "S&P", "S&P", flag)]
 
 #rebaldates <- as.Date(c("2018-07-03", "2018-08-02", "2018-09-05", "2018-10-02", "2018-11-02", "2018-12-02"))
 
-ggplot(portfolioReturns, aes(x=date, y=value)) +
-  geom_line(aes(color = variable), size = 1.2) +
+pic <- ggplot(portfolioReturns, aes(x=date, y=value)) +
+  geom_line(aes(color = flag), size = 1.2) +
   theme_bw() +
   scale_x_date(breaks = pretty_breaks(10)) +
   scale_y_continuous(breaks = pretty_breaks(10)) +
@@ -1907,7 +1913,8 @@ ggplot(portfolioReturns, aes(x=date, y=value)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   #geom_vline(xintercept = as.Date(rebaldates), linetype = "dashed") +
   #annotate(geom = "text", label = "Rebalance", x=as.Date(rebaldates), y=1.6, angle= 90)  +
-  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255))) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255), "darkgreen")) +
+  #scale_linetype_manual(values = c("solid", "dashed", "solid")) +
   theme(
     plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
     panel.background = element_rect(fill = "white"),
@@ -1925,6 +1932,7 @@ ggplot(portfolioReturns, aes(x=date, y=value)) +
   )
 
 
+ggplotly(pic)
 
 ```
 
