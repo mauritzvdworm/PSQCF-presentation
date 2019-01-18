@@ -1804,7 +1804,8 @@ portfolio[, `rolling Sharpe` := `rolling return`/`rolling risk`]
 
 
 portfoliolive <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
-portfoliolive <- portfoliolive[flag != "Backtest" ,.(date, PnL = return, type = flag)]
+portfoliolive <- portfoliolive[,.(date, PnL = return)]
+portfoliolive[, type := ifelse(date < "2019-01-02", "Live", "PSQCF")]
 
 ```
 
@@ -1828,7 +1829,7 @@ pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
   ggtitle("Polar Star Quantitative Commodity Fund Equity Curve") +
   scale_x_date(breaks = pretty_breaks(n = 10)) +
   scale_y_continuous(breaks = pretty_breaks(n = 10)) +
-  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255), "darkgreen")) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255), "firebrick")) +
   theme(
     plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
     panel.background = element_rect(fill = "white"),
@@ -1859,9 +1860,7 @@ ggplotly(pic, tooltip = c("text")) %>%
 
 portfolioReturns <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
 
-portfolioReturns <- portfolioReturns[flag != "Backtest"]
 
-portfolioReturns[, SnPnormalised := (SnPnormalised/portfolioReturns[1, SnPnormalised] - 1) * 100]
 portfolioReturns[, SnPnormalised := na.locf(SnPnormalised)]
 
 ##... FEES ...##
@@ -1896,6 +1895,7 @@ portfolioReturns[, normalized := cumsum(totalreturn) * 100]
 
 ##...      ...##
 
+portfolioReturns[, flag := ifelse(date < "2019-01-02", "Live", "PSQCF")]
 portfolioReturns <- portfolioReturns[, .(date, PSQCF = normalized, `S&P` = SnPnormalised, flag)]
 portfolioReturns <- melt(portfolioReturns, id.vars=c("date", "flag"))
 portfolioReturns[, flag := ifelse(variable == "S&P", "S&P", flag)]
@@ -2002,7 +2002,7 @@ ggplot(portfolio, aes(x=`rolling Sharpe`)) +
 
 ```{r}
 
-tbldata <- rbind(portfolio[,.(date, return = totalreturn)], portfoliolive[, .(date, return = PnL)])
+tbldata <- rbind(portfolio[date < "2018-06-04",.(date, return = totalreturn)], portfoliolive[, .(date, return = PnL)])
 tbldata[, month := month(date)]
 tbldata[, year := year(date)]
 tbldata[, cumret := cumprod(return + 1)]
@@ -2109,21 +2109,21 @@ setnames(tbl3, "variable", "Statistic")
 
 ##
 
-tbl4 <- table.AnnualizedReturns(tbldata[date >= "2018-06-01", .(date, live = return)])
+tbl4 <- table.AnnualizedReturns(tbldata[date >= "2018-06-04", .(date, live = return)])
 nms <- row.names(tbl4)
 tbl4 <- as.data.table(tbl4)
 tbl4[, variable := nms]
 
 tbl4[variable != "Annualized Sharpe (Rf=0%)", live := live * 100]
 
-maxdraw <- maxDrawdown(as.xts(tbldata[date >= "2018-06-01", .(date, return)]))[1] * 100
+maxdraw <- maxDrawdown(as.xts(tbldata[date >= "2018-06-04", .(date, return)]))[1] * 100
 ret.maxdraw <- maxdraw/tbl4[variable == "Annualized Return", live]
 
-avgneg <- monthlydata[sign == -1 & index >= "2018-06-01", mean(cumret) * 100]
-avgpos <- monthlydata[sign == 1 & index >= "2018-06-01", mean(cumret) * 100]
+avgneg <- monthlydata[sign == -1 & index >= "2018-06-04", mean(cumret) * 100]
+avgpos <- monthlydata[sign == 1 & index >= "2018-06-04", mean(cumret) * 100]
 
-noneg <- nrow(monthlydata[sign == -1 & index >= "2018-06-01"])
-nopos <- nrow(monthlydata[sign == 1 & index >= "2018-06-01"])
+noneg <- nrow(monthlydata[sign == -1 & index >= "2018-06-04"])
+nopos <- nrow(monthlydata[sign == 1 & index >= "2018-06-04"])
 
 
 parttoadd <- data.table(
