@@ -1898,7 +1898,7 @@ portfolioReturns[, normalized := cumsum(totalreturn) * 100]
 portfolioReturns[, flag := ifelse(date < "2019-01-02", "Live", "PSQCF")]
 portfolioReturns <- portfolioReturns[, .(date, PSQCF = normalized, `S&P` = SnPnormalised, flag)]
 portfolioReturns <- melt(portfolioReturns, id.vars=c("date", "flag"))
-portfolioReturns[, flag := ifelse(variable == "S&P", "S&P", flag)]
+portfolioReturns[, flag := ifelse(variable == "S&P", "MSCI World TR Index", flag)]
 
 #rebaldates <- as.Date(c("2018-07-03", "2018-08-02", "2018-09-05", "2018-10-02", "2018-11-02", "2018-12-02"))
 
