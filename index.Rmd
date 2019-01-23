@@ -1861,8 +1861,9 @@ ggplotly(pic, tooltip = c("text")) %>%
 
 portfolioReturns <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
 
+portfolioReturns[, SnPnormalised := cumprod(SnPreturn + 1) - 1]
 
-portfolioReturns[, SnPnormalised := na.locf(SnPnormalised)]
+portfolioReturns[, SnPnormalised := SnPnormalised * 100]
 
 ##... FEES ...##
 
