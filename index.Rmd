@@ -1804,8 +1804,9 @@ portfolio[, `rolling Sharpe` := `rolling return`/`rolling risk`]
 
 
 portfoliolive <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
-portfoliolive <- portfoliolive[,.(date, PnL = return)]
+portfoliolive <- portfoliolive[date >= "2018-06-04",.(date, PnL = return)]
 portfoliolive[, type := ifelse(date < "2019-01-02", "Live", "PSQCF")]
+
 
 ```
 
