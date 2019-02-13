@@ -878,11 +878,18 @@ BB1live[, X1 := NULL]
 setnames(BB1live, "index", "date")
 
 
+BB1PSQCF <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/Quant/BB1returns.csv"))
+BB1PSQCF[, X1 := NULL]
+setnames(BB1PSQCF, "index", "date")
+
+
 ```
 
 ```{r}
 
-plotdata <- rbind(BB1returns[date < BB1live[, min(date)],.(date, return, type = "Backtest")], BB1live[,.(date, return = PnL, type = "Live")])
+plotdata <- rbind(BB1returns[date < BB1live[, min(date)],.(date, return, type = "Backtest")], 
+                  BB1live[date < BB1PSQCF[, min(date)],.(date, return = PnL, type = "Live")],
+                  BB1PSQCF[, .(date, return = PnL, type = "PSQCF")])
 plotdata[!is.na(return), cumret := cumsum(return)]
 
 pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
@@ -896,7 +903,7 @@ pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
   ggtitle("BB1 Equity Curve") +
   scale_x_date(breaks = pretty_breaks(n = 10)) +
   scale_y_continuous(breaks = pretty_breaks(n = 10)) +
-  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255))) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255), "firebrick")) +
   theme(
     plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
     panel.background = element_rect(fill = "white"),
@@ -995,12 +1002,19 @@ BB2live[, X1 := NULL]
 setnames(BB2live, "index", "date")
 
 
+BB2PSQCF <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/Quant/BB2returns.csv"))
+BB2PSQCF[, X1 := NULL]
+setnames(BB2PSQCF, "index", "date")
+
+
 ```
 
 
 ```{r}
 
-plotdata <- rbind(BB2returns[date < BB2live[, min(date)],.(date, return, type = "Backtest")], BB2live[,.(date, return = PnL, type = "Live")])
+plotdata <- rbind(BB2returns[date < BB2live[, min(date)],.(date, return, type = "Backtest")], 
+                  BB2live[date < BB2PSQCF[, min(date)],.(date, return = PnL, type = "Live")],
+                  BB2PSQCF[, .(date, return = PnL, type = "PSQCF")])
 plotdata[!is.na(return), cumret := cumsum(return)]
 
 pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
@@ -1014,7 +1028,7 @@ pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
   ggtitle("BB2 Equity Curve") +
   scale_x_date(breaks = pretty_breaks(n = 10)) +
   scale_y_continuous(breaks = pretty_breaks(n = 10)) +
-  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255))) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255), "firebrick")) +
   theme(
     plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
     panel.background = element_rect(fill = "white"),
@@ -1140,7 +1154,7 @@ setnames(tbl1, "variable", "Statistic")
 
 ##
 
-tbl1live <- table.AnnualizedReturns(BB1live[, .(date, `BB1 live` = PnL)])
+tbl1live <- table.AnnualizedReturns(rbind(BB1live[date < BB1PSQCF[, min(date)], .(date, `BB1 live` = PnL)], BB1PSQCF[,.(date, `BB1 live` = PnL)]))
 nms <- row.names(tbl1live)
 tbl1live <- as.data.table(tbl1live)
 tbl1live[, variable := nms]
@@ -1224,7 +1238,7 @@ setnames(tbl2, "variable", "Statistic")
 
 ##
 
-tbl2live <- table.AnnualizedReturns(BB2live[, .(date, `BB2 live` = PnL)])
+tbl2live <- table.AnnualizedReturns(rbind(BB2live[date < BB2PSQCF[, min(date)], .(date, `BB2 live` = PnL)], BB2PSQCF[, .(date, `BB2 live` = PnL)]))
 nms <- row.names(tbl2live)
 tbl2live <- as.data.table(tbl2live)
 tbl2live[, variable := nms]
@@ -1432,12 +1446,20 @@ TR1live[, X1 := NULL]
 setnames(TR1live, "index", "date")
 
 
+TR1PSQCF <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/Quant/TR1returns.csv"))
+TR1PSQCF[, X1 := NULL]
+setnames(TR1PSQCF, "index", "date")
+
+
+
 ```
 
 
 ```{r}
 
-plotdata <- rbind(TR1returns[date < TR1live[, min(date)],.(date, return, type = "Backtest")], TR1live[,.(date, return = PnL, type = "Live")])
+plotdata <- rbind(TR1returns[date < TR1live[, min(date)],.(date, return, type = "Backtest")], 
+                  TR1live[date < TR1PSQCF[, min(date)],.(date, return = PnL, type = "Live")],
+                  TR1PSQCF[, .(date, return = PnL, type = "PSQCF")])
 plotdata[!is.na(return), cumret := cumsum(return)]
 
 pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
@@ -1451,7 +1473,7 @@ pic <- ggplot(plotdata, aes(x=date, y=cumret, group = type,
   ggtitle("TR1 Equity Curve") +
   scale_x_date(breaks = pretty_breaks(n = 10)) +
   scale_y_continuous(breaks = pretty_breaks(n = 10)) +
-  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255))) +
+  scale_color_manual(values = c(rgb(255, 90, 52, maxColorValue = 255), rgb(5,61,96, maxColorValue = 255), "firebrick")) +
   theme(
     plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
     panel.background = element_rect(fill = "white"),
@@ -1574,7 +1596,7 @@ tbl1[, TR1 := round(TR1, 3)]
 
 ##
 
-tbl1live <- table.AnnualizedReturns(TR1live[, .(date, `TR1 live` = PnL)])
+tbl1live <- table.AnnualizedReturns(rbind(TR1live[date < TR1PSQCF[, min(date)], .(date, `TR1 live` = PnL)], TR1PSQCF[, .(date, `TR1 live` = PnL)]))
 nms <- row.names(tbl1live)
 tbl1live <- as.data.table(tbl1live)
 tbl1live[, variable := nms]
@@ -1937,6 +1959,7 @@ pic <- ggplot(portfolioReturns, aes(x=date, y=value)) +
 ggplotly(pic)
 
 ```
+
 
 
 
