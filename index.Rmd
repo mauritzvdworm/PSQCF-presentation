@@ -1941,7 +1941,7 @@ portfolioReturns[, flag := ifelse(variable == "S&P", "MSCI World TR Index", flag
 #rebaldates <- as.Date(c("2018-07-03", "2018-08-02", "2018-09-05", "2018-10-02", "2018-11-02", "2018-12-02"))
 
 pic <- ggplot(portfolioReturns, aes(x=date, y=value)) +
-  geom_line(aes(color = flag), size = 1.2) +
+  geom_line(aes(color = flag)) +
   theme_bw() +
   scale_x_date(breaks = pretty_breaks(10)) +
   scale_y_continuous(breaks = pretty_breaks(10)) +
@@ -2205,7 +2205,8 @@ snp <- snp[date >= portfolio[, min(date)]]
 snp[, SnP := SnP/snp[1, SnP]]
 setnames(snp, "SnP", "S&P500")
 
-quant <- portfolio[, .(date, PSQCF = normalised)]
+#quant <- portfolio[, .(date, PSQCF = normalised)]
+quant <- tbldata[, .(date, PSQCF = cumret)]
 
 together <- merge(quant, snp, by = "date")
 
