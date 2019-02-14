@@ -1217,7 +1217,7 @@ BB2returns[, md := min(date), by = .(year, month)]
 
 #monthlydata <- CalculateReturns(BB2returns[date == md,.(date, normalised)])
 #monthlydata <- as.data.table(monthlydata)
-monthlydata <- BB1returns[,.(normalised = prod(return + 1) - 1), by = .(year, month)]
+monthlydata <- BB2returns[,.(normalised = prod(return + 1) - 1), by = .(year, month)]
 monthlydata[, sign := sign(normalised)]
 
 avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
