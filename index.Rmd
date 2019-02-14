@@ -1125,8 +1125,9 @@ BB1returns[, month := month(date)]
 BB1returns[, year := year(date)]
 BB1returns[, md := min(date), by = .(year, month)]
 
-monthlydata <- CalculateReturns(BB1returns[date == md,.(date, normalised)])
-monthlydata <- as.data.table(monthlydata)
+#monthlydata <- CalculateReturns(BB1returns[date == md,.(date, normalised)])
+#monthlydata <- as.data.table(monthlydata)
+monthlydata <- BB1returns[,.(normalised = prod(return + 1) - 1), by = .(year, month)]
 monthlydata[, sign := sign(normalised)]
 
 avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
@@ -1170,8 +1171,9 @@ BB1tabledata[, md := min(date), by = .(year, month)]
 BB1tabledata[is.na(`BB1 live`), `BB1 live` := 0]
 BB1tabledata[, normalised := cumprod(`BB1 live` + 1)]
 
-monthlydata <- CalculateReturns(BB1tabledata[date == md,.(date, normalised)])
-monthlydata <- as.data.table(monthlydata)
+#monthlydata <- CalculateReturns(BB1tabledata[date == md,.(date, normalised)])
+monthlydata <- BB1tabledata[,.(normalised = prod(`BB1 live` + 1) - 1), by = .(year, month)]
+#monthlydata <- as.data.table(monthlydata)
 monthlydata[, sign := sign(normalised)]
 
 avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
@@ -1213,8 +1215,9 @@ BB2returns[, month := month(date)]
 BB2returns[, year := year(date)]
 BB2returns[, md := min(date), by = .(year, month)]
 
-monthlydata <- CalculateReturns(BB2returns[date == md,.(date, normalised)])
-monthlydata <- as.data.table(monthlydata)
+#monthlydata <- CalculateReturns(BB2returns[date == md,.(date, normalised)])
+#monthlydata <- as.data.table(monthlydata)
+monthlydata <- BB1returns[,.(normalised = prod(return + 1) - 1), by = .(year, month)]
 monthlydata[, sign := sign(normalised)]
 
 avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
@@ -1256,8 +1259,9 @@ BB2tabledata[, md := min(date), by = .(year, month)]
 BB2tabledata[is.na(`BB2 live`), `BB2 live` := 0]
 BB2tabledata[, normalised := cumprod(`BB2 live` + 1)]
 
-monthlydata <- CalculateReturns(BB2tabledata[date == md,.(date, normalised)])
-monthlydata <- as.data.table(monthlydata)
+#monthlydata <- CalculateReturns(BB2tabledata[date == md,.(date, normalised)])
+#monthlydata <- as.data.table(monthlydata)
+monthlydata <- BB2tabledata[,.(normalised = prod(`BB2 live` + 1) - 1), by = .(year, month)]
 monthlydata[, sign := sign(normalised)]
 
 avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
@@ -1576,8 +1580,9 @@ TR1returns[, month := month(date)]
 TR1returns[, year := year(date)]
 TR1returns[, md := min(date), by = .(year, month)]
 
-monthlydata <- CalculateReturns(TR1returns[date == md,.(date, normalised)])
-monthlydata <- as.data.table(monthlydata)
+#monthlydata <- CalculateReturns(TR1returns[date == md,.(date, normalised)])
+#monthlydata <- as.data.table(monthlydata)
+monthlydata <- TR1returns[,.(normalised = prod(return + 1) - 1), by = .(year, month)]
 monthlydata[, sign := sign(normalised)]
 
 avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
@@ -1616,8 +1621,9 @@ TR1tabledata[, md := min(date), by = .(year, month)]
 TR1tabledata[is.na(`TR1 live`), `TR1 live` := 0]
 TR1tabledata[, normalised := cumprod(`TR1 live` + 1)]
 
-monthlydata <- CalculateReturns(TR1tabledata[date == md,.(date, normalised)])
-monthlydata <- as.data.table(monthlydata)
+#monthlydata <- CalculateReturns(TR1tabledata[date == md,.(date, normalised)])
+#monthlydata <- as.data.table(monthlydata)
+monthlydata <- TR1tabledata[,.(normalised = prod(`TR1 live` + 1) - 1), by = .(year, month)]
 monthlydata[, sign := sign(normalised)]
 
 avgneg <- monthlydata[sign == -1, mean(normalised) * 100]
@@ -2042,9 +2048,13 @@ tbldata[, cumret := cumprod(return + 1)]
 tbldata[, cumret := cumret/tbldata[1, cumret]]
 tbldata[, md := min(date), by = .(year, month)]
 
-monthlydata <- CalculateReturns(tbldata[date == md,.(date, cumret)])
-monthlydata <- as.data.table(monthlydata)
+#monthlydata <- CalculateReturns(tbldata[date == md,.(date, cumret)])
+#monthlydata <- as.data.table(monthlydata)
+monthlydata <- tbldata[, .(cumret = prod(return + 1) -1), by = .(year, month)]
 monthlydata[, sign := sign(cumret)]
+
+monthlydata[, index := paste(year, month, 1, sep = "-")]
+monthlydata[, index := as.Date(index)]
 
 avgneg <- monthlydata[sign == -1, mean(cumret) * 100]
 avgpos <- monthlydata[sign == 1, mean(cumret) * 100]
