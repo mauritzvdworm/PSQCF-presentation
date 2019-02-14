@@ -885,6 +885,7 @@ setnames(BB1PSQCF, "index", "date")
 
 ```
 
+
 ```{r}
 
 plotdata <- rbind(BB1returns[date < BB1live[, min(date)],.(date, return, type = "Backtest")], 
@@ -1154,19 +1155,22 @@ setnames(tbl1, "variable", "Statistic")
 
 ##
 
-tbl1live <- table.AnnualizedReturns(rbind(BB1live[date < BB1PSQCF[, min(date)], .(date, `BB1 live` = PnL)], BB1PSQCF[,.(date, `BB1 live` = PnL)]))
+BB1tabledata <- rbind(BB1live[date < BB1PSQCF[, min(date)], .(date, `BB1 live` = PnL)], BB1PSQCF[,.(date, `BB1 live` = PnL)])
+
+tbl1live <- table.AnnualizedReturns(BB1tabledata)
 nms <- row.names(tbl1live)
 tbl1live <- as.data.table(tbl1live)
 tbl1live[, variable := nms]
 
-BB1live[, month := month(date)]
-BB1live[, year := year(date)]
-BB1live[, md := min(date), by = .(year, month)]
 
-BB1live[is.na(PnL), PnL := 0]
-BB1live[, normalised := cumprod(PnL + 1)]
+BB1tabledata[, month := month(date)]
+BB1tabledata[, year := year(date)]
+BB1tabledata[, md := min(date), by = .(year, month)]
 
-monthlydata <- CalculateReturns(BB1live[date == md,.(date, normalised)])
+BB1tabledata[is.na(`BB1 live`), `BB1 live` := 0]
+BB1tabledata[, normalised := cumprod(`BB1 live` + 1)]
+
+monthlydata <- CalculateReturns(BB1tabledata[date == md,.(date, normalised)])
 monthlydata <- as.data.table(monthlydata)
 monthlydata[, sign := sign(normalised)]
 
@@ -1177,7 +1181,7 @@ noneg <- nrow(monthlydata[sign == -1])
 nopos <- nrow(monthlydata[sign == 1])
 
 
-maxdraw <- maxDrawdown(as.xts(BB1live[, .(date, PnL)]))[1] * 100
+maxdraw <- maxDrawdown(as.xts(BB1tabledata[, .(date, `BB1 live`)]))[1] * 100
 ret.maxdraw <- maxdraw/tbl1live[variable == "Annualized Return", `BB1 live` * 100]
 
 parttoadd <- data.table(
@@ -1238,19 +1242,21 @@ setnames(tbl2, "variable", "Statistic")
 
 ##
 
-tbl2live <- table.AnnualizedReturns(rbind(BB2live[date < BB2PSQCF[, min(date)], .(date, `BB2 live` = PnL)], BB2PSQCF[, .(date, `BB2 live` = PnL)]))
+BB2tabledata <- rbind(BB2live[date < BB2PSQCF[, min(date)], .(date, `BB2 live` = PnL)], BB2PSQCF[, .(date, `BB2 live` = PnL)])
+
+tbl2live <- table.AnnualizedReturns(BB2tabledata)
 nms <- row.names(tbl2live)
 tbl2live <- as.data.table(tbl2live)
 tbl2live[, variable := nms]
 
-BB2live[, month := month(date)]
-BB2live[, year := year(date)]
-BB2live[, md := min(date), by = .(year, month)]
+BB2tabledata[, month := month(date)]
+BB2tabledata[, year := year(date)]
+BB2tabledata[, md := min(date), by = .(year, month)]
 
-BB2live[is.na(PnL), PnL := 0]
-BB2live[, normalised := cumprod(PnL + 1)]
+BB2tabledata[is.na(`BB2 live`), `BB2 live` := 0]
+BB2tabledata[, normalised := cumprod(`BB2 live` + 1)]
 
-monthlydata <- CalculateReturns(BB2live[date == md,.(date, normalised)])
+monthlydata <- CalculateReturns(BB2tabledata[date == md,.(date, normalised)])
 monthlydata <- as.data.table(monthlydata)
 monthlydata[, sign := sign(normalised)]
 
@@ -1261,7 +1267,7 @@ noneg <- nrow(monthlydata[sign == -1])
 nopos <- nrow(monthlydata[sign == 1])
 
 
-maxdraw <- maxDrawdown(as.xts(BB2live[, .(date, PnL)]))[1] * 100
+maxdraw <- maxDrawdown(as.xts(BB2tabledata[, .(date, `BB2 live`)]))[1] * 100
 ret.maxdraw <- maxdraw/tbl2live[variable == "Annualized Return", `BB2 live` * 100]
 
 parttoadd <- data.table(
@@ -1596,19 +1602,21 @@ tbl1[, TR1 := round(TR1, 3)]
 
 ##
 
-tbl1live <- table.AnnualizedReturns(rbind(TR1live[date < TR1PSQCF[, min(date)], .(date, `TR1 live` = PnL)], TR1PSQCF[, .(date, `TR1 live` = PnL)]))
+TR1tabledata <- rbind(TR1live[date < TR1PSQCF[, min(date)], .(date, `TR1 live` = PnL)], TR1PSQCF[, .(date, `TR1 live` = PnL)])
+
+tbl1live <- table.AnnualizedReturns(TR1tabledata)
 nms <- row.names(tbl1live)
 tbl1live <- as.data.table(tbl1live)
 tbl1live[, variable := nms]
 
-TR1live[, month := month(date)]
-TR1live[, year := year(date)]
-TR1live[, md := min(date), by = .(year, month)]
+TR1tabledata[, month := month(date)]
+TR1tabledata[, year := year(date)]
+TR1tabledata[, md := min(date), by = .(year, month)]
 
-TR1live[is.na(PnL), PnL := 0]
-TR1live[, normalised := cumprod(PnL + 1)]
+TR1tabledata[is.na(`TR1 live`), `TR1 live` := 0]
+TR1tabledata[, normalised := cumprod(`TR1 live` + 1)]
 
-monthlydata <- CalculateReturns(TR1live[date == md,.(date, normalised)])
+monthlydata <- CalculateReturns(TR1tabledata[date == md,.(date, normalised)])
 monthlydata <- as.data.table(monthlydata)
 monthlydata[, sign := sign(normalised)]
 
@@ -1619,7 +1627,7 @@ noneg <- nrow(monthlydata[sign == -1])
 nopos <- nrow(monthlydata[sign == 1])
 
 
-maxdraw <- maxDrawdown(as.xts(TR1live[, .(date, PnL)]))[1] * 100
+maxdraw <- maxDrawdown(as.xts(TR1tabledata[, .(date, `TR1 live`)]))[1] * 100
 ret.maxdraw <- maxdraw/tbl1live[variable == "Annualized Return", `TR1 live` * 100]
 
 parttoadd <- data.table(
