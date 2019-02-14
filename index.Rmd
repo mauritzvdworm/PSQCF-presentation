@@ -2050,7 +2050,7 @@ tbldata[, md := min(date), by = .(year, month)]
 
 #monthlydata <- CalculateReturns(tbldata[date == md,.(date, cumret)])
 #monthlydata <- as.data.table(monthlydata)
-monthlydata <- tbldata[, .(cumret = prod(return + 1) -1), by = .(year, month)]
+monthlydata <- tbldata[date != c("2018-06-01", "2018-06-02", "2018-06-03"), .(cumret = prod(return + 1) -1), by = .(year, month)]
 monthlydata[, sign := sign(cumret)]
 
 monthlydata[, index := paste(year, month, 1, sep = "-")]
