@@ -2162,11 +2162,11 @@ tbl4[variable != "Annualized Sharpe (Rf=0%)", live := live * 100]
 maxdraw <- maxDrawdown(as.xts(tbldata[date >= "2018-06-04", .(date, return)]))[1] * 100
 ret.maxdraw <- maxdraw/tbl4[variable == "Annualized Return", live]
 
-avgneg <- monthlydata[sign == -1 & index >= "2018-06-04", mean(cumret) * 100]
-avgpos <- monthlydata[sign == 1 & index >= "2018-06-04", mean(cumret) * 100]
+avgneg <- monthlydata[sign == -1 & index >= "2018-06-01", mean(cumret) * 100]
+avgpos <- monthlydata[sign == 1 & index >= "2018-06-01", mean(cumret) * 100]
 
-noneg <- nrow(monthlydata[sign == -1 & index >= "2018-06-04"])
-nopos <- nrow(monthlydata[sign == 1 & index >= "2018-06-04"])
+noneg <- nrow(monthlydata[sign == -1 & index >= "2018-06-01"])
+nopos <- nrow(monthlydata[sign == 1 & index >= "2018-06-01"])
 
 
 parttoadd <- data.table(
