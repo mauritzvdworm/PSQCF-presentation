@@ -1940,7 +1940,10 @@ portfolioReturns[, flag := ifelse(variable == "S&P", "MSCI World TR Index", flag
 
 #rebaldates <- as.Date(c("2018-07-03", "2018-08-02", "2018-09-05", "2018-10-02", "2018-11-02", "2018-12-02"))
 
-pic <- ggplot(portfolioReturns, aes(x=date, y=value)) +
+pic <- ggplot(portfolioReturns, aes(x=date, y=value, group = flag), 
+              text = paste('Cummulative Return: ', round(value,2),
+                                         '<br>Date: ', as.Date(date))
+              ) +
   geom_line(aes(color = flag)) +
   theme_bw() +
   scale_x_date(breaks = pretty_breaks(10)) +
@@ -1970,7 +1973,8 @@ pic <- ggplot(portfolioReturns, aes(x=date, y=value)) +
   )
 
 
-ggplotly(pic)
+ggplotly(pic) %>%
+  layout(legend = list(orientation = "h", x = 0.4, y = -0.2))
 
 ```
 
