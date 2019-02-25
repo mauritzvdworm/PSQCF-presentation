@@ -2395,7 +2395,7 @@ pic <- ggplot(plotdata, aes(x=date, y=value, group = variable,
                                   '<br>Date: ', as.Date(date))
                      )
        ) +
-  geom_line(aes(group = variable, color = variable), size = 1.2) +
+  geom_line(aes(group = variable, color = variable)) +
   ylab("Cummulative Return") +
   xlab("") +
   ggtitle("Polar Star Quantitative Commodity Fund, Ltd an S&P500 Equity Curves") +
