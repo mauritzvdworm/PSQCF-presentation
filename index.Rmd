@@ -1844,6 +1844,23 @@ portfoliolive <- portfoliolive[date >= "2018-06-04",.(date, PnL = return)]
 portfoliolive[, type := ifelse(date < "2019-01-02", "Live", "PSQCF")]
 
 
+##... FEES ...##
+
+portfoliolive[, year := year(date)]
+portfoliolive[, month := month(date)]
+#portfoliolive[, half := ifelse(month < 7, 1, 2)]
+
+portfoliolive[, md := max(date), by = .(year, month)]
+
+portfoliolive[, management := 0]
+portfoliolive[date == md, management := 0.02/12]
+portfoliolive[date == max(date), management := 0]
+
+portfoliolive[, totalreturn := PnL - management]
+
+
+portfoliolive <- portfoliolive[,.(date, PnL = totalreturn, type)]
+
 ```
 
 
