@@ -1762,6 +1762,7 @@ portfolio[, half := ifelse(month < 7, 1, 2)]
 
 
 portfolio[date == md, management := 0.02/12]
+portfolio[date == max(date), management := 0]
 
 portfolio[, totalreturn := return - management]
 
@@ -1996,6 +1997,56 @@ ggplotly(pic) %>%
 ```
 
 
+## Quantitative Portfolio - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
+
+
+```{r}
+
+plotdata <- rbind(portfolio[date < portfoliolive[, min(date)],.(date, return = totalreturn, type = "Backtest")], portfoliolive[,.(date, return = PnL, type)])
+plotdata[!is.na(return), cumret := cumsum(return)]
+
+plotdata[, month := month(date)]
+plotdata[, day := substring(date, 9,10)]
+plotdata[, year := year(date)]
+plotdata[, newdate := paste("2000", month, day, sep = "-")]
+plotdata[, newdate := as.Date(newdate)]
+plotdata[, normalised := cumprod(1 + return), by = year]
+
+
+meandata <- plotdata[, .(return = cumprod(1+return) - 1), by = .(month, year)]
+meandata <- meandata[, .(return = mean(return)), by = month]
+meandata[, newdate := paste(2000, month, 28, sep="-")]
+meandata[, newdate := as.Date(newdate)]
+start <- data.table(month = 0, return = 0, newdate = as.Date("2000-01-01"))
+meandata <- rbind(start, meandata)
+meandata[, normalised := cumprod(1 + return)]
+
+ggplot(plotdata[year > 2000 & year != max(year)], aes(x=newdate, y=normalised)) +
+  geom_line(aes(group = year), alpha = 0.3) +
+  geom_line(data = plotdata[year == max(year)], color = "steelblue", size = 1.2) +
+  geom_line(data = plotdata[year %in% c(2008, 2003)], aes(color = factor(year))) + 
+  scale_x_date(labels = date_format("%b"), breaks = pretty_breaks(n=10)) +
+  geom_hline(yintercept = 1) +
+  xlab("") +
+  ylab("Value of $1") +
+  ggtitle("Yearly Performance of $1 invested on 1st of Jan") +
+  theme(
+    plot.background = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.y = element_line(size = 0.5, linetype = 'solid',colour = "gray"),
+    panel.grid.major.x = element_line(size = 0.5, linetype = 'dashed',colour = "gray"),
+    axis.title.x = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    axis.title.y = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 16),
+    plot.title = element_text(colour = rgb(5,61,96, maxColorValue = 255), size = 18, face = "bold"),
+    axis.text = element_text(size=16),
+    text=element_text(family="Century Gothic"),
+    legend.key = element_rect(fill = rgb(242,242,242, maxColorValue = 255)),
+    legend.background=element_blank(),
+    legend.title=element_blank(),
+    legend.position="bottom"
+  )
+
+```
 
 
 ## Quantitative Portfolio - Statistics {data-background="img/BlueBackgroundWithOrange.png"}
