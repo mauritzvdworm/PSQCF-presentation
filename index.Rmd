@@ -2021,9 +2021,10 @@ start <- data.table(month = 0, return = 0, newdate = as.Date("2000-01-01"))
 meandata <- rbind(start, meandata)
 meandata[, normalised := cumprod(1 + return)]
 
-ggplot(plotdata[year > 2000 & year != max(year)], aes(x=newdate, y=normalised)) +
+pic <- ggplot(plotdata[year > 2000 & year != max(year)], aes(x=newdate, y=normalised)) +
   geom_line(aes(group = year), alpha = 0.3) +
   geom_line(data = plotdata[year == max(year)], color = "steelblue", size = 1.2) +
+  geom_line(data = meandata, color = "firebrick", linetype = "dashed") +
   geom_line(data = plotdata[year %in% c(2008, 2003)], aes(color = factor(year))) + 
   scale_x_date(labels = date_format("%b"), breaks = pretty_breaks(n=10)) +
   geom_hline(yintercept = 1) +
@@ -2045,6 +2046,8 @@ ggplot(plotdata[year > 2000 & year != max(year)], aes(x=newdate, y=normalised)) 
     legend.title=element_blank(),
     legend.position="bottom"
   )
+
+ggplotly(pic)
 
 ```
 
