@@ -352,7 +352,7 @@ $$
 
 ```{r}
 
-tradeData <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Start Ideas/PS trend/tradeData.csv"))
+tradeData <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Start Ideas/PS trend/tradeData.csv"))
 
 tradeData[, monthcut := cut(month, breaks = c(0,3,6,9,12,15,18,21,24))]
 
@@ -463,7 +463,7 @@ of Investment Management - JP Morgan US Equity Quantitative Research</a>
 
 ```{r}
 
-contPrices <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/CalendarPortfolio/contCalendarFracDiff.csv"))
+contPrices <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/CalendarPortfolio/contCalendarFracDiff.csv"))
 
 ```
 
@@ -617,7 +617,7 @@ How to obtain a stationary time series
 
 ```{r}
 
-fracdiffData <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/CalendarPortfolio/calendarFractionalDifferences.csv"))
+fracdiffData <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/CalendarPortfolio/calendarFractionalDifferences.csv"))
 
 setnames(fracdiffData, "X1", "d")
 
@@ -870,15 +870,15 @@ ggplot(meanSpreadData, aes(x=month, y=mean)) +
 
 ```{r}
 
-BB1returns <- as.data.table(read_csv('C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/BB1portfoioreturns.csv'))
+BB1returns <- as.data.table(read_csv('C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/BB1portfoioreturns.csv'))
 BB1returns[!is.na(return), cumret := cumsum(return)]
 
-BB1live <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/BB1returns.csv"))
+BB1live <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/BB1returns.csv"))
 BB1live[, X1 := NULL]
 setnames(BB1live, "index", "date")
 
 
-BB1PSQCF <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/Quant/BB1returns.csv"))
+BB1PSQCF <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/Quant/BB1returns.csv"))
 BB1PSQCF[, X1 := NULL]
 setnames(BB1PSQCF, "index", "date")
 
@@ -995,15 +995,15 @@ ggplot(BB1returns, aes(x=`rolling Sharpe`)) +
 
 ```{r}
 
-BB2returns <- as.data.table(read_csv('C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/calendarPortfolio_EWMA_RSI.csv'))
+BB2returns <- as.data.table(read_csv('C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/calendarPortfolio_EWMA_RSI.csv'))
 BB2returns[!is.na(return), cumret := cumsum(return)]
 
-BB2live <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/BB2returns.csv"))
+BB2live <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/BB2returns.csv"))
 BB2live[, X1 := NULL]
 setnames(BB2live, "index", "date")
 
 
-BB2PSQCF <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/Quant/BB2returns.csv"))
+BB2PSQCF <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/Quant/BB2returns.csv"))
 BB2PSQCF[, X1 := NULL]
 setnames(BB2PSQCF, "index", "date")
 
@@ -1352,7 +1352,7 @@ can we trade it profitably?
 
 ```{r}
 
-allPrices <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Start Ideas/PS trend/designing strategies/allPrices.csv"))
+allPrices <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Start Ideas/PS trend/designing strategies/allPrices.csv"))
 setnames(allPrices, names(allPrices), c("date", "price", "comdty"))
 
 allPrices[, ref := substring(comdty, 3, 3)]
@@ -1390,7 +1390,7 @@ ggplot(allPrices[date >= "2003-01-01" & ref > 3], aes(x=date, y=price)) +
 
 ```{r}
 
-returns_instrument_forecast_divmult_scale_weight_estimates <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Start Ideas/PS trend/designing strategies/returns_instrument_forecast_divmult_scale_weight_estimates.csv"))
+returns_instrument_forecast_divmult_scale_weight_estimates <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Start Ideas/PS trend/designing strategies/returns_instrument_forecast_divmult_scale_weight_estimates.csv"))
 setnames(returns_instrument_forecast_divmult_scale_weight_estimates, names(returns_instrument_forecast_divmult_scale_weight_estimates), c("date", "return"))
 
 returns_instrument_forecast_divmult_scale_weight_estimates <- returns_instrument_forecast_divmult_scale_weight_estimates[date >= "2002-12-31"]
@@ -1427,7 +1427,7 @@ ggplot(returns_instrument_forecast_divmult_scale_weight_estimates, aes(x=date, y
 
 ```{r}
 
-TR1returns <- as.data.table(read_csv('C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/trendPortfolioReturns.csv'))
+TR1returns <- as.data.table(read_csv('C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/trendPortfolioReturns.csv'))
 TR1returns <- TR1returns[ , .(date = X1, return = `percent return`/100)]
 TR1returns <- TR1returns[date >= "1998-01-02"]
 TR1returns[!is.na(return), cumret := cumsum(return)]
@@ -1451,12 +1451,12 @@ TR1returns[, `rolling Sharpe` := `rolling return`/`rolling risk`]
 
 
 
-TR1live <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/TR1returns.csv"))
+TR1live <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/TR1returns.csv"))
 TR1live[, X1 := NULL]
 setnames(TR1live, "index", "date")
 
 
-TR1PSQCF <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/Quant/TR1returns.csv"))
+TR1PSQCF <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/Quant/TR1returns.csv"))
 TR1PSQCF[, X1 := NULL]
 setnames(TR1PSQCF, "index", "date")
 
@@ -1840,7 +1840,7 @@ portfolio[, `rolling Sharpe` := `rolling return`/`rolling risk`]
 # portfoliolive[, PnL := BB1 * BB1weight + BB2 * BB2weight + TR1 * TR1weight]
 
 
-portfoliolive <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
+portfoliolive <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
 portfoliolive <- portfoliolive[date >= "2018-06-04",.(date, PnL = return)]
 portfoliolive[, type := ifelse(date < "2019-01-02", "Live", "PSQCF")]
 
@@ -1913,7 +1913,7 @@ ggplotly(pic, tooltip = c("text")) %>%
 
 ```{r}
 
-portfolioReturns <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
+portfolioReturns <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/portfolioReturnsQCF.csv"))
 
 portfolioReturns[, SnPnormalised := cumprod(SnPreturn + 1) - 1]
 
@@ -2275,7 +2275,7 @@ formattable(tbl)
 
 ```{r}
 
-snp <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/spx.csv"))
+snp <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/spx.csv"))
 
 snp <- snp[date >= portfolio[, min(date)]]
 snp[, SnP := SnP/snp[1, SnP]]
@@ -2438,7 +2438,7 @@ formattable(tbl)
 
 ```{r}
 
-together <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/together.csv"))
+together <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/together.csv"))
 together <- together[order(date)]
 
 fees <- portfolio[date == md, .(year, month, fees = management + performance)]
@@ -2501,7 +2501,7 @@ ggplotly(pic) %>%
 
 ```{r}
 
-together <- as.data.table(read_csv("C:/Users/mauritz/Box Sync/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/together.csv"))
+together <- as.data.table(read_csv("C:/Box/Polar Star - Company Folder/1. Polar Star/Analysis/Analysis and Research/code/Quant Portfolio/data/together.csv"))
 
 fees <- portfolio[date == md, .(year, month, fees = management + performance)]
 
