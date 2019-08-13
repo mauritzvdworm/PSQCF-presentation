@@ -21,6 +21,7 @@ output:
 
 
 ```{r setup, include=FALSE}
+
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 
 library(data.table)
@@ -236,7 +237,9 @@ ggplotly(pic)
 
 - <a href = "http://www.cftc.gov/idc/groups/public/@economicanalysis/documents/file/oce_automatedtrading_update.pdf" target="_blank">Automated Trading in Futures Markets - Update, Richard Haynes and John S. Roberts</a>
 
+- <a href = "https://www.cftc.gov/sites/default/files/2019-04/ATS_2yr_Update_Final_2018_ada.pdf" target="_blank">Automated Trading in Futures Markets - Update 2, Richard Haynes and John S. Roberts</a>
 
+- <a href = "https://www.cftc.gov/sites/default/files/2019-03/automatedordersreport032719.pdf" target="_blank">Impact of Automated Orders in Futures Markets, CFTC</a>
 
 
 
