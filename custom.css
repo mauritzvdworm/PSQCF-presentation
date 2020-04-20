@@ -1,5 +1,6 @@
 body {
-  background-color: #053D61; 
+  #background-color: #053D61; 
+  background-color: rgb(23,13,69);
 }
 
 
@@ -116,33 +117,48 @@ body {
 	white-space: pre-line; /* wrapping, although it overflows*/
 }
 
+
+body {
+  color: rgb(23,13,69); 
+}
+
 /* Headings */
 
-.reveal h1 { /* Heading 1 */
-	text-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2); /* shadows */
-	font-weight: bold; /* bold */
-	color: white;
+.reveal {
+  color: rgb(23,13,69);
 }
 
-.reveal h2 { /* Heading 2 */
-	color: white;
-}
-
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4,
+.reveal h5,
+.reveal h6 {
+  color: rgb(23,13,69);
+  }
 
 .reveal h2.author { /* Heading 2 for an author */
 	font-style: normal; /* could make bold or italics */
-	color: white;
+	#color: white;
+	color: rgb(23,13,69);
 }
 
 .reveal h3.date { /* Heading 2 for an author */
 	font-style: normal; /* could make bold or italics */
-	color: white;
+	#color: white;
+	color: rgb(23,13,69);
 }
 
 
-.reveal section  {
-  color: white;
+.reveal section p {
+  color: rgb(23,13,69);
 }
+
+
+.reveal .title {
+        margin-top: 450px;
+        margin-bottom: 50px;
+     }
 
 /*********************************************
  * LINKS
@@ -160,7 +176,8 @@ body {
  * NAVIGATION CONTROLS
  *********************************************/
 .reveal .controls {
-  color: #FF5A34; 
+  #color: #FF5A34; 
+  color: rgb(23,13,69);
 }
 
 /*********************************************
@@ -168,7 +185,8 @@ body {
  *********************************************/
 .reveal .progress {
   background: rgba(0, 0, 0, 0.2);
-  color: #FF5A34; 
+  #color: #FF5A34; 
+  color: rgb(23,13,69);
 }
 
 .reveal .progress span {
@@ -179,7 +197,7 @@ body {
 
 
 .reveal section p {
-  color: white;
+  color: rgb(23,13,69);
 }
 
 /* Images */
