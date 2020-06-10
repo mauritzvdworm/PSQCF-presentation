@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+<script src="lib/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="lib/bootstrap-3.3.5/css/simplex.min.css" rel="stylesheet" />
+<script src="lib/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="lib/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="lib/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="lib/kePrint-0.0.1/kePrint.js"></script>
+
+</head>
+<body>
+<table class="table table-striped table-hover" style="font-size: 12px; ">
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:right;"> 1 Month </th>
+   <th style="text-align:right;"> 3 Month </th>
+   <th style="text-align:right;"> 6 Month </th>
+   <th style="text-align:right;"> 1 Year </th>
+   <th style="text-align:right;"> 2 Year </th>
+   <th style="text-align:right;"> 3 Year </th>
+   <th style="text-align:right;"> 5 Year </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Best </td>
+   <td style="text-align:right;"> 20.01 </td>
+   <td style="text-align:right;"> 46.51 </td>
+   <td style="text-align:right;"> 81.33 </td>
+   <td style="text-align:right;"> 100.70 </td>
+   <td style="text-align:right;"> 165.95 </td>
+   <td style="text-align:right;"> 296.47 </td>
+   <td style="text-align:right;"> 438.92 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Worst </td>
+   <td style="text-align:right;"> -9.75 </td>
+   <td style="text-align:right;"> -18.29 </td>
+   <td style="text-align:right;"> -13.78 </td>
+   <td style="text-align:right;"> -16.37 </td>
+   <td style="text-align:right;"> -7.71 </td>
+   <td style="text-align:right;"> 9.41 </td>
+   <td style="text-align:right;"> 23.01 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Average </td>
+   <td style="text-align:right;"> 1.34 </td>
+   <td style="text-align:right;"> 4.11 </td>
+   <td style="text-align:right;"> 8.40 </td>
+   <td style="text-align:right;"> 17.69 </td>
+   <td style="text-align:right;"> 40.94 </td>
+   <td style="text-align:right;"> 71.08 </td>
+   <td style="text-align:right;"> 160.74 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Median </td>
+   <td style="text-align:right;"> 0.81 </td>
+   <td style="text-align:right;"> 3.16 </td>
+   <td style="text-align:right;"> 5.92 </td>
+   <td style="text-align:right;"> 13.28 </td>
+   <td style="text-align:right;"> 25.71 </td>
+   <td style="text-align:right;"> 36.87 </td>
+   <td style="text-align:right;"> 95.38 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Last </td>
+   <td style="text-align:right;"> -0.22 </td>
+   <td style="text-align:right;"> -4.75 </td>
+   <td style="text-align:right;"> 12.87 </td>
+   <td style="text-align:right;"> 7.89 </td>
+   <td style="text-align:right;"> 14.32 </td>
+   <td style="text-align:right;"> 41.33 </td>
+   <td style="text-align:right;"> 50.47 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Winning (%) </td>
+   <td style="text-align:right;"> 59.18 </td>
+   <td style="text-align:right;"> 69.96 </td>
+   <td style="text-align:right;"> 82.08 </td>
+   <td style="text-align:right;"> 87.61 </td>
+   <td style="text-align:right;"> 98.65 </td>
+   <td style="text-align:right;"> 100.00 </td>
+   <td style="text-align:right;"> 100.00 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Avg. Pos. Period </td>
+   <td style="text-align:right;"> 3.94 </td>
+   <td style="text-align:right;"> 7.29 </td>
+   <td style="text-align:right;"> 11.17 </td>
+   <td style="text-align:right;"> 20.87 </td>
+   <td style="text-align:right;"> 41.56 </td>
+   <td style="text-align:right;"> 71.08 </td>
+   <td style="text-align:right;"> 160.74 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Avg. Neg. Period </td>
+   <td style="text-align:right;"> -2.42 </td>
+   <td style="text-align:right;"> -3.31 </td>
+   <td style="text-align:right;"> -4.29 </td>
+   <td style="text-align:right;"> -4.82 </td>
+   <td style="text-align:right;"> -4.46 </td>
+   <td style="text-align:right;"> NaN </td>
+   <td style="text-align:right;"> NaN </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> # Of Periods </td>
+   <td style="text-align:right;"> 245.00 </td>
+   <td style="text-align:right;"> 243.00 </td>
+   <td style="text-align:right;"> 240.00 </td>
+   <td style="text-align:right;"> 234.00 </td>
+   <td style="text-align:right;"> 222.00 </td>
+   <td style="text-align:right;"> 210.00 </td>
+   <td style="text-align:right;"> 186.00 </td>
+  </tr>
+</tbody>
+</table>
+</body>
+</html>
